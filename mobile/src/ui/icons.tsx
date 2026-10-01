@@ -35,6 +35,7 @@ export const IconExport = (p: P) => <S {...p}><Path d="M12 3v12M7 8l5-5 5 5M5 14
 export const IconCheck = (p: P) => <S {...p}><Path d="M5 12.5l4.5 4.5L19 7.5" /></S>;
 export const IconWarn = (p: P) => <S {...p}><Path d="M12 4 2.5 20h19z" /><Path d="M12 10v4M12 17.2v.1" /></S>;
 export const IconBolt = (p: P) => <S {...p}><Path d="M13 3 5 13.5h6L10 21l8-10.5h-6z" /></S>;
+export const IconScan = (p: P) => <S {...p}><Path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" /><Path d="M8 10h8M8 14h5" /></S>;
 export const IconFilter = (p: P) => <S {...p}><Path d="M4 6h16M7 12h10M10 18h4" /></S>;
 
 export const IconMoodFab = (p: P) => (

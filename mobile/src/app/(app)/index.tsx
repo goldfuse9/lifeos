@@ -237,7 +237,7 @@ export default function Prehled() {
       </ScrollView>
 
       <BottomFade />
-      {!searchOpen ? <FabMenu open={menuOpen} onOpenChange={setMenuOpen} onMood={() => router.push('/zapis')} onMe={() => router.push('/nastaveni')} /> : null}
+      {!searchOpen ? <FabMenu open={menuOpen} onOpenChange={setMenuOpen} onMood={() => router.push('/zapis')} onMe={() => router.push('/nastaveni')} onScan={() => router.push('/skener')} /> : null}
       <PrehledSearch revealed={menuOpen} open={searchOpen} onOpen={() => setSearchOpen(true)} onClose={() => setSearchOpen(false)} />
     </View>
   );

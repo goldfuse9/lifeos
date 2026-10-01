@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSession } from '@/state/session';
 import { C, ME_STYLES, initials } from './theme';
 import { PillButton, RadialFill, T, haptic } from './kit';
-import { IconMoodFab, IconPlus, IconSearch } from './icons';
+import { IconMoodFab, IconPlus, IconScan, IconSearch } from './icons';
 
 /**
  * Plovoucí tlačítka u spodního okraje.
@@ -18,6 +18,7 @@ export const MENU_IDLE_MS = 4500;
 
 const PINK = ['#EE3F7A', '#F2729A', '#F7B3C7'] as const;
 const ORANGE = ['#F7931E', '#F9A945', '#FCD29B'] as const;
+const BLUE = ['#3B6FE0', '#6A92EC', '#B4C9F6'] as const;
 
 function Round({ stops, label, onPress, children, right, shadow, border, ring, expanded }: { stops: readonly string[]; label: string; onPress: () => void; children: React.ReactNode; right: number; shadow: string; border: string; ring: string; expanded?: boolean }) {
   const insets = useSafeAreaInsets();
@@ -99,7 +100,7 @@ export function ActionFab({ label, onPress, icon, a11y }: { label: string; onPre
  * Rozbalovací menu Přehledu. Stav `open` drží rodič, protože růžové
  * hledání (PrehledSearch) se vysouvá spolu s ním.
  */
-export function FabMenu({ open, onOpenChange, onMood, onMe }: { open: boolean; onOpenChange: (open: boolean) => void; onMood: () => void; onMe: () => void }) {
+export function FabMenu({ open, onOpenChange, onMood, onMe, onScan }: { open: boolean; onOpenChange: (open: boolean) => void; onMood: () => void; onMe: () => void; onScan: () => void }) {
   const anim = useAnimatedValue(open ? 1 : 0);
 
   useEffect(() => {
@@ -114,6 +115,7 @@ export function FabMenu({ open, onOpenChange, onMood, onMe }: { open: boolean; o
   }, [open, onOpenChange]);
 
   const tx = anim.interpolate({ inputRange: [0, 1], outputRange: [128, 0] });
+  const tx2 = anim.interpolate({ inputRange: [0, 1], outputRange: [192, 0] });
 
   return (
     <>
@@ -126,6 +128,22 @@ export function FabMenu({ open, onOpenChange, onMood, onMe }: { open: boolean; o
             onMood();
           }}
         />
+      </Animated.View>
+      <Animated.View pointerEvents={open ? 'box-none' : 'none'} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 19, opacity: anim, transform: [{ translateX: tx2 }] }}>
+        <Round
+          stops={BLUE}
+          label="Chytrý skener"
+          right={208}
+          shadow="0px 12px 32px rgba(59,111,224,0.40)"
+          border="rgba(255,255,255,0.35)"
+          ring="rgba(255,255,255,0.65)"
+          onPress={() => {
+            onOpenChange(false);
+            onScan();
+          }}
+        >
+          <IconScan color={C.white} size={22} />
+        </Round>
       </Animated.View>
       <MeFab label={open ? 'Moje karta a nastavení' : 'Otevřít menu'} expanded={open} onPress={() => (open ? (onOpenChange(false), onMe()) : onOpenChange(true))} />
     </>
