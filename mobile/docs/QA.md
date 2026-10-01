@@ -135,3 +135,13 @@ nesmí vidět nic ze starého.
 | --- | --- |
 | Nouzová karta → Na zamčenou obrazovku | Přepínače jen u vyplněných údajů, náhled se mění |
 | Uložit obrázek → Uložit do Fotek → nastavit jako tapetu zámku | Hodiny nahoře nepřekrývají údaje |
+
+## M. Widget (iOS)
+
+| Test | Očekávání |
+| --- | --- |
+| Plocha → podržet → + → LifeOS → Rychlý zápis (střední) | Obličeje, Příznaky, Záznam |
+| Klepnout na obličej při zamčené appce | Face ID → otevře se „Jak se cítíte?“ s vybranou náladou |
+| Klepnout na Záznam | Nový záznam |
+| Zamčená obrazovka → upravit → widget LifeOS „+“ | Otevře zápis po odemknutí |
+| Widget neukazuje žádná zdravotní data | ✅ |

@@ -9,6 +9,7 @@ import { PlusJakartaSans_600SemiBold } from '@expo-google-fonts/plus-jakarta-san
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SessionProvider, useSession } from '@/state/session';
+import { usePendingLink } from '@/state/deepLink';
 import { Backdrop, T, ToastProvider } from '@/ui/kit';
 import { C } from '@/ui/theme';
 
@@ -37,6 +38,7 @@ export default function RootLayout() {
 
 function Gate() {
   const { status, covered } = useSession();
+  usePendingLink(status);
 
   useEffect(() => {
     if (status !== 'loading') SplashScreen.hideAsync().catch(() => {});

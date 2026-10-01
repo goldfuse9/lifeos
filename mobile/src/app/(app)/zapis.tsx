@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Linking, Pressable, ScrollView, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useData, usePerson, useSession } from '@/state/session';
@@ -23,7 +23,12 @@ export default function Zapis() {
   const cycle = useCycle();
   const toast = useToast();
   const insets = useSafeAreaInsets();
-  const [s, setS] = useState<SymptomSelection>(emptySelection);
+  // Z widgetu může přijít předvybraná nálada (lifeos://zapis?mood=3).
+  const params = useLocalSearchParams<{ mood?: string }>();
+  const [s, setS] = useState<SymptomSelection>(() => {
+    const m = Number(params.mood);
+    return Number.isInteger(m) && m >= 0 && m < MOODS.length ? { ...emptySelection(), mood: m } : emptySelection();
+  });
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
 
