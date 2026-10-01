@@ -5,6 +5,7 @@ import { useData, usePerson } from '@/state/session';
 import { useLoad } from '@/state/useLoad';
 import { EMERGENCY_FIELDS, emergencyProgress, extractPhone } from '@/domain/emergency';
 import { medsForEmergency } from '@/domain/meds';
+import { tetanusYear } from '@/domain/vaccines';
 import type { EmergencyData } from '@/domain/types';
 import { Backdrop, BottomFade, Callout, Card, H1, Muted, Note, PrimaryButton, SecondaryButton, T, TopBar, useScreenInsets, useUi } from '@/ui/kit';
 import { MeFab } from '@/ui/fabs';
@@ -24,10 +25,11 @@ export default function Nouze() {
   const data = useData();
   const person = usePerson();
   const { value: em } = useLoad(async () => {
-    const [e, m] = await Promise.all([data.personData.get(person.id, 'emergency'), data.personData.get(person.id, 'meds')]);
+    const [e, m, vax] = await Promise.all([data.personData.get(person.id, 'emergency'), data.personData.get(person.id, 'meds'), data.records.query({ personId: person.id, types: ['vaccine'] })]);
     // Léky ze seznamu Léky + to, co je ručně v nouzových údajích.
     const meds = [medsForEmergency(m.list ?? []), e.meds].filter(Boolean).join('; ');
-    return { ...e, meds: meds || undefined };
+    // Tetanus z Očkování, pokud není vyplněný ručně.
+    return { ...e, meds: meds || undefined, tetanus: e.tetanus || tetanusYear(vax) || undefined };
   }, [person.id]);
   const e: EmergencyData = em ?? {};
   const { filled } = emergencyProgress(e);
@@ -65,6 +67,7 @@ export default function Nouze() {
         </Card>
 
         <PrimaryButton style={{ marginTop: 16 }} label="Upravit nouzové údaje" onPress={() => router.push('/nastaveni/nouzove')} />
+        <SecondaryButton style={{ marginTop: 10 }} label="Na zamčenou obrazovku" onPress={() => router.push('/tapeta')} />
 
         <Card style={{ marginTop: 16, padding: 16, flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
           <View style={{ width: 36, height: 36, borderRadius: 13, backgroundColor: '#F1F0EE', alignItems: 'center', justifyContent: 'center' }}>

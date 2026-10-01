@@ -146,6 +146,15 @@ export default function Settings() {
         <Group title="Zdraví" dot="#9B3FE0">
           <Row title="Moji lékaři" sub={value?.doctors ? value.doctors + ' · přidat, upravit, odebrat' : 'Zatím žádný'} onPress={() => router.push('/nastaveni/lekari')} />
           <Divider />
+          <Row
+            title="Očkování"
+            sub="Co, kdy a kdy přeočkovat"
+            onPress={() => {
+              router.back();
+              router.push('/ockovani');
+            }}
+          />
+          <Divider />
           <Row title="Nouzové údaje" sub={value ? `${value.em.filled} z ${value.em.total} vyplněno · co uvidí záchranář` : undefined} warn={!!value && value.em.filled === 0} onPress={() => router.push('/nastaveni/nouzove')} />
         </Group>
 

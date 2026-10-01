@@ -33,6 +33,7 @@ const PLACEHOLDER: Record<RecordType, string> = {
   note: 'Např. Prořezává se zub',
   mood: '',
   cycle: '',
+  vaccine: '',
 };
 
 const WITH_PLACE: RecordType[] = ['event', 'visit', 'result'];

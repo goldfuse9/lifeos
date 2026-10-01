@@ -119,3 +119,19 @@ nesmí vidět nic ze starého.
 | Upravit dávku na 75 µg | V ose „Změna: …“ |
 | Přestat brát | V ose „Konec: …“, lék v „Dříve“, zmizí z nouzové karty |
 | Připomínat zapnuto, čas za 2 min (Jiný čas) | Upozornění „… · čas na lék“; klepnutí otevře Léky |
+
+## K. Očkování
+
+| Test | Očekávání |
+| --- | --- |
+| Já → Očkování → Zapsat očkování → Tetanus, datum 2016 | Předvyplněno „Za 10 let“, v přehledu „Po termínu“, v ose „Očkování: Tetanus“ |
+| Nouzová karta | „Očkování proti tetanu: 2016“ (když není vyplněné ručně) |
+| Očkovací průkaz → vyfotit | „1 fotka · otevřít“, fotka i v Dokumentech |
+| Chřipka s přeočkováním za rok, upozornění zapnutá | V Já → Upozornění je připomínka měsíc předem |
+
+## L. Tapeta zamčené obrazovky
+
+| Test | Očekávání |
+| --- | --- |
+| Nouzová karta → Na zamčenou obrazovku | Přepínače jen u vyplněných údajů, náhled se mění |
+| Uložit obrázek → Uložit do Fotek → nastavit jako tapetu zámku | Hodiny nahoře nepřekrývají údaje |

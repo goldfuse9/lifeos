@@ -27,7 +27,8 @@ export type RecordType =
   | 'doc'
   | 'note'
   | 'mood'
-  | 'cycle';
+  | 'cycle'
+  | 'vaccine';
 
 export interface RecordChild {
   label: string;
@@ -133,6 +134,8 @@ export interface DocsData {
   backId?: string;
   /** Platnost kartičky, MM/RR. */
   validUntil?: string;
+  /** Záznam „Očkovací průkaz“ s fotkami stránek. */
+  vaxRecordId?: string;
 }
 
 /** Nouzové údaje — co se ukáže na nouzové kartě. */

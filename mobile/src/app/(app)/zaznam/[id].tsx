@@ -158,7 +158,7 @@ export default function RecordDetail() {
         </View>
 
         <View style={{ marginTop: 28, gap: 10 }}>
-          <PrimaryButton label="Upravit" onPress={() => (r.type === 'cycle' ? router.push({ pathname: '/cyklus/zapis', params: { id: r.id } }) : router.push({ pathname: '/zaznam/upravit', params: { id: r.id } }))} />
+          <PrimaryButton label="Upravit" onPress={() => (r.type === 'cycle' ? router.push({ pathname: '/cyklus/zapis', params: { id: r.id } }) : r.type === 'vaccine' ? router.push({ pathname: '/ockovani/upravit', params: { id: r.id } }) : router.push({ pathname: '/zaznam/upravit', params: { id: r.id } }))} />
           <SecondaryButton label="Smazat záznam" danger onPress={remove} icon={<IconTrash size={16} color={C.danger} width={1.8} />} />
         </View>
       </ScrollView>

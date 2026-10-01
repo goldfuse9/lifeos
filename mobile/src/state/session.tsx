@@ -9,6 +9,7 @@ import { biometricInfo, newId, randomBytes, secureKeyStore, type BiometricInfo }
 import { backupFiles, sandboxFiles } from '@/platform/files';
 import { collectBackup, openBackup, restoreBackup, sealBackup } from '@/services/backup';
 import { MAX_SCHEDULED, medRemindersFor, remindOf, remindersFor } from '@/domain/reminders';
+import { vaccineReminders } from '@/domain/vaccines';
 import { addDays, toLocalDate } from '@/domain/dates';
 import { applyReminders, clearReminders, notificationPermission } from '@/platform/notifications';
 
@@ -94,14 +95,17 @@ async function syncReminders(d: HcData, st: AppSettings): Promise<void> {
   const today = toLocalDate(now);
   const items = [];
   const medItems = [];
+  const vaxItems = [];
   for (const p of await d.persons.list()) {
     const recs = await d.records.query({ personId: p.id, from: addDays(today, -1), to: addDays(today, 62), order: 'asc' });
     for (const r of recs) if (remindOf(r).length) items.push({ r, personName: p.name, isSelf: p.isSelf });
     medItems.push({ meds: (await d.personData.get(p.id, 'meds')).list ?? [], personId: p.id, personName: p.name, isSelf: p.isSelf });
+    vaxItems.push({ records: await d.records.query({ personId: p.id, types: ['vaccine'] }), personId: p.id, personName: p.name, isSelf: p.isSelf });
   }
   // Denní léky mají přednost (každý čas je jen jedno opakované upozornění).
   const meds = medRemindersFor(medItems, now, st.remindShowTitle);
-  await applyReminders([...meds, ...remindersFor(items, now, st.remindShowTitle)].slice(0, MAX_SCHEDULED));
+  const dated = [...remindersFor(items, now, st.remindShowTitle), ...vaccineReminders(vaxItems, now, st.remindShowTitle)].sort((a, b) => a.at.getTime() - b.at.getTime());
+  await applyReminders([...meds, ...dated].slice(0, MAX_SCHEDULED));
 }
 
 async function openData(dekHex: string): Promise<HcData> {
