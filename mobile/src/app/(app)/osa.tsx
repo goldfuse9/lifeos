@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { useData, usePerson } from '@/state/session';
 import { useLoad, useNow } from '@/state/useLoad';
 import { RECORD_TYPES, RECORD_TYPE_ORDER } from '@/domain/recordTypes';
-import { daySummary, ensureToday, groupByDay, nowLineIndex, type TimelineDay } from '@/domain/timeline';
+import { daySummary, ensureToday, groupByDay, isPending, nowLineIndex, type TimelineDay } from '@/domain/timeline';
 import { plural, toLocalDate, toLocalTime } from '@/domain/dates';
 import type { Attachment, HcRecord, RecordType } from '@/domain/types';
 import { Backdrop, BottomFade, Chip, H1, Muted, SecondaryButton, T, TopBar, useScreenInsets, useUi } from '@/ui/kit';
@@ -55,7 +55,8 @@ export default function Osa() {
   }, [person.id, query, types.join(','), onlyFiles, limit]);
 
   const sections: Section[] = useMemo(() => {
-    const list = value?.list ?? [];
+    // Naplánované se v ose ukážou až hodinu po svém čase (hledání je najde vždy).
+    const list = (value?.list ?? []).filter((r) => filtering || !isPending(r, now));
     let days = groupByDay(list, today);
     if (!filtering) days = ensureToday(days, today);
     return days.map((d, idx) => {
@@ -67,7 +68,7 @@ export default function Osa() {
       }
       return { ...d, data: items, idx };
     });
-  }, [value, today, nowTime, filtering]);
+  }, [value, today, nowTime, filtering, now]);
 
   const total = value?.list.length ?? 0;
   const head = sections[Math.min(active, sections.length - 1)];
@@ -220,6 +221,7 @@ export default function Osa() {
               <View style={{ flex: 1, height: 40, borderRadius: 20, backgroundColor: C.field, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12 }}>
                 <IconSearch size={16} color={C.muted} width={1.6} />
                 <TextInput
+                  keyboardAppearance="light"
                   autoFocus
                   accessibilityLabel="Hledat v záznamech"
                   value={query}

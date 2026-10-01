@@ -136,7 +136,6 @@ export default function Cyklus() {
                   title={shortDate(h.start, today)}
                   sub={[h.length ? `${h.length} ${plural(h.length, 'den', 'dny', 'dní')}` : 'probíhá', h.periodDays ? `menstruace ${h.periodDays} ${plural(h.periodDays, 'den', 'dny', 'dní')}` : null].filter(Boolean).join(' · ')}
                   right={h.shift != null ? <ShiftBadge shift={h.shift} /> : undefined}
-                  onPress={h.recordId ? () => goLog({ id: h.recordId! }) : () => router.push('/cyklus/nastaveni')}
                 />
               </View>
             ))}

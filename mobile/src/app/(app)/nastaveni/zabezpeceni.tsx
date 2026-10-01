@@ -100,7 +100,7 @@ export default function Zabezpeceni() {
           />
           {mode === 'bio' ? (
             <View style={{ padding: 14, paddingTop: 0, gap: 10 }}>
-              <Field label="Potvrďte heslem" value={pw} onChangeText={setPw} secureTextEntry autoFocus textContentType="password" onSubmitEditing={confirmBio} />
+              <Field label="Potvrďte heslem" value={pw} onChangeText={setPw} secureTextEntry textContentType="password" onSubmitEditing={confirmBio} />
               {err ? <T style={{ color: C.danger, fontSize: 13 }}>{err}</T> : null}
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 <SecondaryButton label="Zrušit" onPress={reset} style={{ flex: 1, minHeight: 48 }} />
@@ -123,7 +123,7 @@ export default function Zabezpeceni() {
           <T w="semibold" style={{ fontSize: 15 }}>Změnit heslo</T>
           {mode === 'pw' ? (
             <>
-              <Field label="Současné heslo" value={pw} onChangeText={setPw} secureTextEntry textContentType="password" autoFocus />
+              <Field label="Současné heslo" value={pw} onChangeText={setPw} secureTextEntry textContentType="password" />
               <Field label="Nové heslo" value={pwNew} onChangeText={setPwNew} secureTextEntry textContentType="newPassword" hint="Aspoň 8 znaků." />
               <Field label="Nové heslo znovu" value={pwNew2} onChangeText={setPwNew2} secureTextEntry textContentType="newPassword" />
               {err ? <T style={{ color: C.danger, fontSize: 13 }}>{err}</T> : null}

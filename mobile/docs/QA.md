@@ -11,10 +11,10 @@ Projděte na **iOS i Androidu**. Každý řádek je buď ✅, nebo zapište, co 
 | 3 | Zapnout Face ID / otisk | Výzva OS, pak Přehled „Ahoj, Jano“ |
 | 4 | Projít Přehled → Osa → zpět → Dokumenty → zpět → Nouzová karta → zpět → Já | Všude cesta zpět, nic nespadne |
 | 5 | Osa → Záznam: Návštěva, název, místo, poznámka, Uložit | Záznam v ose u správného času |
-| 6 | Upravit datum a čas na zítra 8:00 | Záznam se přesune pod „Zítra“ |
+| 6 | Upravit datum a čas na zítra 8:00 | Záznam z osy zmizí, je v Kalendáři a „Blíží se“; v ose se objeví zítra v 9:00 |
 | 7 | Detail → Přidat přílohu → Vyfotit; pak Vybrat soubor (PDF) | Dvě přílohy v detailu i v ose |
 | 8 | Klepnout na fotku / PDF | Fotka se zobrazí; PDF se otevře v systému |
-| 9 | Kalendář → zítřek → Naplánovat → „Odběr krve“ 7:30 | Tečka v kalendáři, záznam v ose i v „Blíží se“ |
+| 9 | Kalendář → zítřek → Naplánovat → „Odběr krve“ 7:30 | Tečka v kalendáři a v „Blíží se“; v ose až hodinu po termínu |
 | 10 | Upravit termín | Změna všude |
 | 11 | Smazat termín | Zmizí z kalendáře, osy i Přehledu |
 | 12 | Já → Vzhled → Teplé sklo; Zabezpečení → Zamknout hned | Pozadí se změní všude |
@@ -84,3 +84,6 @@ nesmí vidět nic ze starého.
 | Osa, Cyklus, Dokumenty | Vpravo dole jen černé „+ Zapsat“ / „+ Nahrát“, hledání je v hlavičce |
 | Já → Osobní údaje | Stav „Chybí n údajů“, BMI z výšky a váhy |
 | Já → Doklady → Líc/Rub vyfotit | Kartička „Nahráno ✓“, fotka i v Dokumentech → Doklady |
+| Zapsat (osa, cyklus) | Klávesnice se nevysune sama, až po klepnutí do pole; žádné pole „Den“ |
+| Osa → Zapsat → „Jiný den nebo čas“ | Objeví se datum a čas pro plánování |
+| Cyklus → Historie cyklů | Řádky jen ukazují, úprava je v „Upravit cyklus“ |

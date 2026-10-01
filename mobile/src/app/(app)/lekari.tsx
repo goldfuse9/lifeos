@@ -109,7 +109,6 @@ export default function Lekari() {
                 setEditing({ ...editing, name: v });
               }}
               placeholder={hasRegistry ? 'Začněte psát příjmení nebo obor a město' : 'MUDr. Jana Nováková'}
-              autoFocus
               autoCorrect={false}
               error={tried && !editing.name.trim() ? 'Vyplňte jméno.' : null}
             />

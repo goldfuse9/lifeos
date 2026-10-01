@@ -1,5 +1,5 @@
 import { addDays, ageOn, dayTitle, diffDays, genitive, isValidLocalDate, isValidLocalTime, longDate, monthGrid, relativeDays, vocative } from '@/domain/dates';
-import { buildSymptomRecord, emptySelection, ensureToday, groupByDay, isUpcoming, nowLineIndex } from '@/domain/timeline';
+import { buildSymptomRecord, emptySelection, ensureToday, groupByDay, isPending, isUpcoming, nowLineIndex } from '@/domain/timeline';
 import type { HcRecord } from '@/domain/types';
 
 const rec = (date: string, time: string | null, title = 'x'): HcRecord => ({
@@ -51,4 +51,18 @@ test('zápis nálady a příznaků', () => {
     { label: 'Cyklus', value: 'menstruace slabá, Akné', type: 'symptom' },
   ]);
   expect(buildSymptomRecord({ ...emptySelection(), general: ['Teplota'] })!.title).toBe('Teplota');
+});
+
+test('naplánovaný záznam se v ose ukáže až hodinu po termínu', () => {
+  const created = new Date(2026, 9, 1, 8, 0).toISOString();
+  const base = { id: 'x', personId: 'p', type: 'visit', title: 'Návštěva', description: '', metadata: {}, createdAt: created, updatedAt: created, deletedAt: null } as HcRecord;
+  const planned = { ...base, date: '2026-10-02', time: '09:00' } as HcRecord;
+  expect(isPending(planned, new Date(2026, 9, 2, 9, 30))).toBe(true);
+  expect(isPending(planned, new Date(2026, 9, 2, 10, 1))).toBe(false);
+  // Zapsáno teď / zpětně — hned v ose.
+  expect(isPending({ ...base, date: '2026-10-01', time: '08:00' } as HcRecord, new Date(2026, 9, 1, 8, 1))).toBe(false);
+  expect(isPending({ ...base, date: '2026-09-30', time: null } as HcRecord, new Date(2026, 9, 1, 8, 1))).toBe(false);
+  // Celodenní plán — od začátku svého dne.
+  expect(isPending({ ...base, date: '2026-10-03', time: null } as HcRecord, new Date(2026, 9, 2, 23, 0))).toBe(true);
+  expect(isPending({ ...base, date: '2026-10-03', time: null } as HcRecord, new Date(2026, 9, 3, 0, 1))).toBe(false);
 });

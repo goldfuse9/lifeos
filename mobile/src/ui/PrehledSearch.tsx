@@ -140,6 +140,7 @@ export function PrehledSearch({ open, onOpen, onClose, revealed = true }: { open
                   <View style={{ flex: 1, height: 40, borderRadius: 20, backgroundColor: C.field, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12 }}>
                     <IconSearch size={16} color={C.muted} width={1.6} />
                     <TextInput
+                  keyboardAppearance="light"
                       ref={inputRef}
                       accessibilityLabel="Hledat v kartě"
                       value={q}

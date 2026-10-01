@@ -8,6 +8,7 @@ import type { HcRecord, RecordMetadata, RecordType } from '@/domain/types';
 import type { PickedFile } from '@/services/attachments';
 import { Backdrop, Card, Chip, Field, H1, Loading, PrimaryButton, Segmented, T, TopBar, useScreenInsets, useToast } from '@/ui/kit';
 import { DateField, TimeField } from '@/ui/DateTimeField';
+import { isPending } from '@/domain/timeline';
 import { chooseSource, confirm, pickFrom } from '@/ui/device';
 import { C } from '@/ui/theme';
 import { IconClip, IconClose } from '@/ui/icons';
@@ -60,6 +61,7 @@ export default function RecordEditor() {
   const [staged, setStaged] = useState<PickedFile[]>([]);
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [whenOpen, setWhenOpen] = useState(false);
   const [dirty, setDirty] = useState(false);
   // Posluchač „beforeRemove“ čte ref, ne stav — po uložení se musí odejít hned.
   const dirtyRef = useRef(false);
@@ -101,6 +103,7 @@ export default function RecordEditor() {
   };
 
   const isEdit = !!params.id;
+  const showWhen = isEdit || whenOpen || type === 'event' || initialDate !== toLocalDate(now);
   const isMood = type === 'mood';
   const titleError = !title.trim() ? 'Vyplňte název.' : null;
 
@@ -143,7 +146,7 @@ export default function RecordEditor() {
         }
       }
       touch();
-      toast(failed ? `Uloženo, ale ${failed} ${failed === 1 ? 'soubor se nepovedl' : 'soubory se nepovedly'}` : isEdit ? 'Změny uloženy' : 'Zapsáno do osy');
+      toast(failed ? `Uloženo, ale ${failed} ${failed === 1 ? 'soubor se nepovedl' : 'soubory se nepovedly'}` : isEdit ? 'Změny uloženy' : isPending(rec, new Date()) ? 'Naplánováno · do osy se propíše hodinu po termínu' : 'Zapsáno do osy');
       dirtyRef.current = false;
       setDirty(false);
       setBusy(false);
@@ -181,15 +184,24 @@ export default function RecordEditor() {
         )}
 
         <Card style={{ marginTop: 16, padding: 16, gap: 14 }}>
-          <Field label="Název" value={title} onChangeText={set(setTitle)} placeholder={PLACEHOLDER[type]} autoFocus={!isEdit} returnKeyType="next" error={tried ? titleError : null} maxLength={140} />
-          <View style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
-            <DateField label="Datum" value={date} onChange={set(setDate)} />
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <T w="semibold" style={{ fontSize: 15 }}>Celý den</T>
-            <Switch accessibilityLabel="Celý den" value={allDay} onValueChange={set(setAllDay)} trackColor={{ true: C.ink, false: '#E6E5E2' }} thumbColor={C.white} ios_backgroundColor="#E6E5E2" />
-          </View>
-          {!allDay ? <TimeField label="Čas" date={date} value={time} onChange={set(setTime)} /> : null}
+          <Field label="Název" value={title} onChangeText={set(setTitle)} placeholder={PLACEHOLDER[type]} returnKeyType="next" error={tried ? titleError : null} maxLength={140} />
+          {showWhen ? (
+            <>
+              <View style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
+                <DateField label="Datum" value={date} onChange={set(setDate)} />
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <T w="semibold" style={{ fontSize: 15 }}>Celý den</T>
+                <Switch accessibilityLabel="Celý den" value={allDay} onValueChange={set(setAllDay)} trackColor={{ true: C.ink, false: '#E6E5E2' }} thumbColor={C.white} ios_backgroundColor="#E6E5E2" />
+              </View>
+              {!allDay ? <TimeField label="Čas" date={date} value={time} onChange={set(setTime)} /> : null}
+            </>
+          ) : (
+            // Nový zápis „teď“ — den člověk zná, pole by jen překážela.
+            <Pressable accessibilityRole="button" hitSlop={8} onPress={() => setWhenOpen(true)} style={{ alignSelf: 'flex-start' }}>
+              <T style={{ fontSize: 13, color: C.muted, textDecorationLine: 'underline' }}>Jiný den nebo čas (naplánovat)</T>
+            </Pressable>
+          )}
           {WITH_PLACE.includes(type) ? <Field label="Kde / u koho" value={place} onChangeText={set(setPlace)} placeholder="Např. MUDr. Nováková, Poliklinika" maxLength={140} /> : null}
           {type === 'result' ? (
             <View style={{ gap: 6 }}>

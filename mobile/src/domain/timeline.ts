@@ -1,6 +1,6 @@
 import type { HcRecord, LocalDate, RecordChild, RecordMetadata, RecordType } from './types';
 import { MOODS, SYM_GROUPS, SYM_INTENSITY } from './recordTypes';
-import { dayTitle, daySubtitle, plural } from './dates';
+import { combine, dayTitle, daySubtitle, plural } from './dates';
 
 /**
  * Čisté funkce nad záznamy — seskupení do dnů pro osu, výběr „Blíží se“
@@ -121,4 +121,20 @@ export function buildSymptomRecord(s: SymptomSelection): { type: RecordType; tit
     description: '',
     metadata: { ...(hasMood ? { mood: s.mood! } : {}), tags: s.general.slice(), children },
   };
+}
+
+/** Za jak dlouho po plánovaném čase se záznam objeví v ose. */
+export const REVEAL_AFTER_MS = 60 * 60 * 1000;
+
+/**
+ * Naplánovaný záznam, jehož čas ještě nenastal (+ hodina). Do osy patří
+ * jen to, co se stalo — plán je v kalendáři a v „Blíží se“.
+ * Naplánovaný = jeho čas je pozdější než chvíle, kdy byl zapsán.
+ * Celodenní se ukáže od začátku svého dne.
+ */
+export function isPending(r: HcRecord, now: Date): boolean {
+  const at = combine(r.date, r.time).getTime();
+  const created = Date.parse(r.createdAt);
+  if (!Number.isFinite(created) || at <= created + 5 * 60 * 1000) return false;
+  return now.getTime() < (r.time ? at + REVEAL_AFTER_MS : at);
 }

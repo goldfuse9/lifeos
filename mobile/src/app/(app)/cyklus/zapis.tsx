@@ -4,10 +4,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useData, usePerson, useSession } from '@/state/session';
 import { useCycle } from '@/state/useCycle';
 import { CYCLE_SYMPTOMS, FLOWS, PAIN_LABEL, buildCycleRecord, computeCycle, cycleLogOf, shiftFor, shiftLabel, type CycleLog, type CycleSettings, type Flow } from '@/domain/cycle';
-import { diffDays, isValidLocalDate, toLocalDate } from '@/domain/dates';
+import { diffDays, isValidLocalDate, shortDate, toLocalDate } from '@/domain/dates';
 import type { HcRecord } from '@/domain/types';
 import { Backdrop, Card, Chip, Field, H1, Loading, Muted, PrimaryButton, Segmented, SecondaryButton, T, ToggleRow, TopBar, useToast } from '@/ui/kit';
-import { DateField } from '@/ui/DateTimeField';
 import { confirm } from '@/ui/device';
 import { CY } from '@/ui/cycleViz';
 import { MOODS } from '@/domain/recordTypes';
@@ -52,7 +51,7 @@ function Form({ settings, records, editing, date0, start0, today }: { settings: 
   const toast = useToast();
   const c0 = editing ? cycleLogOf(editing) : null;
 
-  const [date, setDate] = useState(editing?.date ?? date0);
+  const date = editing?.date ?? date0;
   const [start, setStart] = useState(!!c0?.start || start0);
   const [flow, setFlow] = useState<Flow | null>(c0?.flow ?? (start0 ? 'medium' : null));
   const [pain, setPain] = useState(c0?.pain ?? 0);
@@ -114,11 +113,8 @@ function Form({ settings, records, editing, date0, start0, today }: { settings: 
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: Platform.OS === 'ios' ? 20 : 48, paddingHorizontal: 16, paddingBottom: 48 }}>
         <TopBar title={person.name} backLabel="Zavřít" />
         <H1 style={{ marginTop: 18, paddingLeft: 8 }}>{editing ? 'Upravit zápis' : 'Zápis cyklu'}</H1>
-        <Muted style={{ paddingLeft: 8, marginTop: 4 }}>{day ? `${day}. den cyklu` : 'Zapíše se do časové osy'}</Muted>
+        <Muted style={{ paddingLeft: 8, marginTop: 4 }}>{(date !== today ? shortDate(date, today) + ' · ' : '') + (day ? `${day}. den cyklu` : 'zapíše se do časové osy')}</Muted>
 
-        <Card style={{ marginTop: 16, padding: 16 }}>
-          <DateField label="Den" value={date} onChange={(d) => (d <= today ? setDate(d) : toast('Zapisovat jde jen dnešek a minulé dny'))} />
-        </Card>
 
         {/* Tři filtry — klepnutí rozbalí nabídku pod nimi */}
         <View accessibilityRole="tablist" style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-around' }}>

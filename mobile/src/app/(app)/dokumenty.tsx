@@ -105,7 +105,7 @@ export default function Dokumenty() {
         {searchOpen ? (
           <View style={{ marginTop: 16, height: 48, borderRadius: 24, backgroundColor: C.white, borderWidth: 1, borderColor: C.line, flexDirection: 'row', alignItems: 'center', paddingLeft: 14, paddingRight: 4, gap: 8 }}>
             <IconSearch size={16} color={C.muted} width={1.6} />
-            <TextInput autoFocus value={q} onChangeText={setQ} accessibilityLabel="Hledat v dokumentech" placeholder="Název, záznam, typ…" placeholderTextColor="#8E8C94" style={{ flex: 1, height: 48, fontFamily: F.regular, fontSize: 15, color: C.ink }} />
+            <TextInput keyboardAppearance="light" autoFocus value={q} onChangeText={setQ} accessibilityLabel="Hledat v dokumentech" placeholder="Název, záznam, typ…" placeholderTextColor="#8E8C94" style={{ flex: 1, height: 48, fontFamily: F.regular, fontSize: 15, color: C.ink }} />
             <Pressable accessibilityRole="button" accessibilityLabel="Zavřít hledání" onPress={() => { setQ(''); setSearchOpen(false); }} style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
               <IconClose size={16} />
             </Pressable>

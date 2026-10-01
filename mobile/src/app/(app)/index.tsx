@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { useData, usePerson, useSession } from '@/state/session';
 import { useLoad, useNow } from '@/state/useLoad';
 import { RECORD_TYPES } from '@/domain/recordTypes';
-import { isUpcoming, recordSubtitle } from '@/domain/timeline';
+import { isPending, isUpcoming, recordSubtitle } from '@/domain/timeline';
 import { MONTHS_SHORT, WEEKDAYS_SHORT, addDays, longDate, parseLocalDate, plural, relativeDays, startOfWeek, toLocalDate, toLocalTime, vocative } from '@/domain/dates';
 import { Backdrop, BottomFade, Card, DateBadge, Muted, PillButton, T, Tile, useScreenInsets, useUi } from '@/ui/kit';
 import { FabMenu } from '@/ui/fabs';
@@ -48,7 +48,7 @@ export default function Prehled() {
     ]);
     return {
       upcoming: future.filter((r) => isUpcoming(r, today, nowTime)).slice(0, 8),
-      recent: past.filter((r) => !isUpcoming(r, today, nowTime)).slice(0, 6),
+      recent: past.filter((r) => !isUpcoming(r, today, nowTime) && !isPending(r, new Date())).slice(0, 6),
       docs: docs.length,
       week,
     };

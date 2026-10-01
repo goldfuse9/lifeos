@@ -1,6 +1,8 @@
-import React, { createContext, useCallback, useContext, useId, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Keyboard,
+  Platform,
   Pressable,
   StyleSheet,
   Switch,
@@ -58,8 +60,28 @@ export function Muted({ children, style, ...rest }: TextProps & { children: Reac
 /* ---------------------------------------------------------------- pozadí */
 
 /** Skleněné pozadí: barevné skvrny z plátna jako radiální přechody. */
+/**
+ * Výška klávesnice (iOS). Pod klávesnici se podkládá plná plocha, aby
+ * průhledná systémová klávesnice nepropouštěla barevné pozadí — vypadá
+ * klidněji a čitelněji. Průhlednost samotné klávesnice aplikace měnit nemůže.
+ */
+function useKeyboardHeight(): number {
+  const [h, setH] = useState(0);
+  useEffect(() => {
+    if (Platform.OS !== 'ios') return;
+    const show = Keyboard.addListener('keyboardWillShow', (e) => setH(e.endCoordinates.height));
+    const hide = Keyboard.addListener('keyboardWillHide', () => setH(0));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+  return h;
+}
+
 export function Backdrop() {
   const ui = useUi();
+  const kb = useKeyboardHeight();
   return (
     <View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: ui.bg }]}>
       {ui.glass && (
@@ -79,6 +101,7 @@ export function Backdrop() {
           <Circle cx="91%" cy="99%" r="230" fill="url(#b2)" />
         </Svg>
       )}
+      {kb ? <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: kb + 24, backgroundColor: '#F2F2F1' }} /> : null}
     </View>
   );
 }
@@ -289,6 +312,7 @@ export function Field({ label, hint, error, style, ref, ...rest }: TextInputProp
       <TextInput
         ref={ref}
         placeholderTextColor="#8E8C94"
+        keyboardAppearance="light"
         accessibilityLabel={label}
         {...rest}
         onFocus={(e) => {

@@ -77,7 +77,7 @@ export default function KartaEdit() {
               </Pressable>
             ))}
           </View>
-          <Field label="Jméno" value={name} onChangeText={setName} autoFocus={!existing} placeholder="Např. Ema" error={tried && !name.trim() ? 'Vyplňte jméno.' : null} maxLength={60} />
+          <Field label="Jméno" value={name} onChangeText={setName} placeholder="Např. Ema" error={tried && !name.trim() ? 'Vyplňte jméno.' : null} maxLength={60} />
           <View style={{ gap: 6 }}>
             <T w="semibold" style={{ fontSize: 13, color: C.muted }}>Kdo to je</T>
             <Segmented label="Vztah" options={[['child', 'Dítě'], ['partner', 'Partner/ka'], ['parent', 'Rodič'], ['other', 'Jiný']]} value={relation} onChange={setRelation} />
