@@ -1,0 +1,70 @@
+{
+  "expo": {
+    "name": "HumanCare",
+    "slug": "humancare",
+    "scheme": "humancare",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#FCFBFA",
+    "ios": {
+      "bundleIdentifier": "cz.humancare.prototype",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "cz.humancare.prototype",
+      "allowBackup": false,
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "backgroundColor": "#FCFBFA"
+        }
+      ],
+      [
+        "expo-sqlite",
+        {
+          "useSQLCipher": true
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "HumanCare používá Face ID k odemknutí vaší karty."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "HumanCare používá Face ID k odemknutí vaší karty."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "HumanCare potřebuje fotoaparát, abyste mohli vyfotit lékařskou zprávu nebo recept.",
+          "photosPermission": "HumanCare potřebuje přístup k fotkám, abyste mohli připojit snímek k záznamu."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

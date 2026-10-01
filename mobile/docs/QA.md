@@ -1,0 +1,61 @@
+# Ruční test — fáze 1
+
+Projděte na **iOS i Androidu**. Každý řádek je buď ✅, nebo zapište, co se stalo.
+
+## A. Scénář z instrukcí (bod 17)
+
+| # | Krok | Očekávání |
+| --- | --- | --- |
+| 1 | Nainstalovat a spustit | Úvod „Zdraví celé rodiny na jednom místě“ |
+| 2 | Vytvořit účet (jméno, e-mail, heslo 2×) | Krok „Rychlé odemykání“ |
+| 3 | Zapnout Face ID / otisk | Výzva OS, pak Přehled „Ahoj, Jano“ |
+| 4 | Projít Přehled → Osa → zpět → Dokumenty → zpět → Nouzová karta → zpět → Já | Všude cesta zpět, nic nespadne |
+| 5 | Osa → Záznam: Návštěva, název, místo, poznámka, Uložit | Záznam v ose u správného času |
+| 6 | Upravit datum a čas na zítra 8:00 | Záznam se přesune pod „Zítra“ |
+| 7 | Detail → Přidat přílohu → Vyfotit; pak Vybrat soubor (PDF) | Dvě přílohy v detailu i v ose |
+| 8 | Klepnout na fotku / PDF | Fotka se zobrazí; PDF se otevře v systému |
+| 9 | Kalendář → zítřek → Naplánovat → „Odběr krve“ 7:30 | Tečka v kalendáři, záznam v ose i v „Blíží se“ |
+| 10 | Upravit termín | Změna všude |
+| 11 | Smazat termín | Zmizí z kalendáře, osy i Přehledu |
+| 12 | Já → Vzhled → Teplé sklo; Zabezpečení → Zamknout hned | Pozadí se změní všude |
+| 13 | Zavřít aplikaci (vyhodit z přepínače) | — |
+| 14 | Otevřít | Výzva k Face ID / heslu |
+| 15 | Odemknout | Všechna data jsou zpět, pozadí teplé |
+
+## B. Odolnost
+
+| Test | Očekávání |
+| --- | --- |
+| Režim letadlo, celý scénář A | Vše funguje |
+| Restart telefonu, otevřít | Data zůstala |
+| Zámek „Po 1 min“, odejít na 30 s | Neuzamkne se |
+| Zámek „Po 1 min“, odejít na 2 min | Uzamkne se |
+| Zámek „Hned“, nahrát fotku z galerie (Android) | Během výběru se neuzamkne |
+| Přepínač aplikací | Místo obsahu jen logo |
+| 5× špatné heslo | Odpočet „Zkuste to za 30 s“ |
+| Zrušit Face ID výzvu | Zůstane přihlášení heslem |
+| Odhlásit se (Já → Odhlásit se) | Přihlašovací obrazovka, data po přihlášení zpět |
+| Změnit heslo, odhlásit, přihlásit starým / novým | Staré nejde, nové jde |
+| Vypnout biometrii, zavřít, otevřít | Jen heslo, žádná výzva OS |
+
+## C. Rodina a údaje
+
+| Test | Očekávání |
+| --- | --- |
+| Já → Přidat kartu „Ema“, dítě | Přepne se na Emu, Přehled „Karta Ema“ |
+| Záznam u Emy, pak „Zpět na moji kartu“ | Emin záznam není v mé ose |
+| Nouzové údaje: alergie, léky, „Koho volat“ s telefonem | Nouzová karta je ukazuje, „Volat kontakt“ vytáčí |
+| Lékař s telefonem | Zelené tlačítko vytáčí |
+| Odebrat kartu Emy | Zmizí i její záznamy a soubory |
+| Zápis: Trup → Bolest na hrudi | Červené varování a „Volat 155“ |
+| Já → Sledovat cyklus zapnout | V zápisu je sekce Cyklus (jen na mé kartě) |
+
+## D. Mrtvá tlačítka
+
+Klepnout na **každé** tlačítko na každé obrazovce. Nic nesmí neudělat nic.
+Položky „Připravujeme“ musí ukázat hlášku, že přijdou s online verzí.
+
+## E. Smazání všeho
+
+Já → Zabezpečení → Smazat vše → potvrdit 2× → úvodní obrazovka; nový účet
+nesmí vidět nic ze starého.
