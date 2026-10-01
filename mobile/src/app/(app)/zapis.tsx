@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useData, usePerson, useSession } from '@/state/session';
+import { useCycle } from '@/state/useCycle';
 import { MOODS, SYM_GENERAL, SYM_GROUPS, SYM_INTENSITY, SYM_RED_FLAGS, isPainful } from '@/domain/recordTypes';
 import { buildSymptomRecord, emptySelection, selectionCount, type SymptomSelection } from '@/domain/timeline';
 import { plural, toLocalDate, toLocalTime } from '@/domain/dates';
@@ -18,7 +19,8 @@ import { IconChevronDown, IconClose } from '@/ui/icons';
 export default function Zapis() {
   const data = useData();
   const person = usePerson();
-  const { settings, self, touch } = useSession();
+  const { self, touch } = useSession();
+  const cycle = useCycle();
   const toast = useToast();
   const insets = useSafeAreaInsets();
   const [s, setS] = useState<SymptomSelection>(emptySelection);
@@ -27,7 +29,7 @@ export default function Zapis() {
 
   const isSelf = !!self && self.id === person.id;
   // Cyklus jen na vlastní kartě a jen když si ho člověk zapnul (jako na plátně).
-  const groups = SYM_GROUPS.filter((g) => !g.cycle || (isSelf && settings.cycleTracking));
+  const groups = SYM_GROUPS.filter((g) => !g.cycle || !!cycle.settings.enabled);
   const count = selectionCount(s);
   const canSave = s.mood != null || count > 0;
   const redFlag = Object.values(s.byGroup).some((list) => list.some((x) => SYM_RED_FLAGS.includes(x)));

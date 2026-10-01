@@ -26,7 +26,8 @@ export type RecordType =
   | 'med'
   | 'doc'
   | 'note'
-  | 'mood';
+  | 'mood'
+  | 'cycle';
 
 export interface RecordChild {
   label: string;

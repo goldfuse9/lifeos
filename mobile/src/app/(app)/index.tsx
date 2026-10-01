@@ -9,6 +9,9 @@ import { MONTHS_SHORT, WEEKDAYS_SHORT, addDays, longDate, parseLocalDate, plural
 import { Backdrop, BottomFade, Card, DateBadge, Muted, PillButton, T, Tile, useScreenInsets, useUi } from '@/ui/kit';
 import { MeFab, MoodFab } from '@/ui/fabs';
 import { PrehledSearch } from '@/ui/PrehledSearch';
+import { useCycle } from '@/state/useCycle';
+import { CY } from '@/ui/cycleViz';
+import type { CycleInfo } from '@/domain/cycle';
 import { Wordmark } from '@/ui/Wordmark';
 import { C } from '@/ui/theme';
 import { IconCalendar, IconClose, IconPlus } from '@/ui/icons';
@@ -31,6 +34,8 @@ export default function Prehled() {
   const [openUp, setOpenUp] = useState(false);
   const [openRec, setOpenRec] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const cycle = useCycle();
+  const showCycle = (!!cycle.settings.enabled && !cycle.settings.hideOnOverview) || cycle.suggest;
 
   const weekStart = startOfWeek(today);
   const { value } = useLoad(async () => {
@@ -100,6 +105,7 @@ export default function Prehled() {
         {/* Dlaždice — vodorovný pás jako na desce (zoom 0,85 → 197 × 207) */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} snapToInterval={207} decelerationRate="fast" style={{ marginTop: 12, marginHorizontal: -16 }} contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 4, gap: 10 }}>
           <TileTimeline onPress={() => router.push('/osa')} />
+          {showCycle ? <TileCycle info={cycle.settings.enabled ? cycle.info : null} onPress={() => router.push('/cyklus')} /> : null}
           <TileDoctors onPress={() => router.push('/lekari')} />
           <TileDocs count={value?.docs ?? 0} onPress={() => router.push('/dokumenty')} />
         </ScrollView>
@@ -290,6 +296,45 @@ function TileDoctors({ onPress }: { onPress: () => void }) {
         </View>
         {bar(68)}
         {bar(48)}
+      </View>
+    </TileShell>
+  );
+}
+
+function TileCycle({ info, onPress }: { info: CycleInfo | null; onPress: () => void }) {
+  let big = '';
+  let sub = 'Nastavit sledování';
+  if (info?.hasData && info.day != null) {
+    if (info.inPeriod) {
+      big = info.day + '.';
+      sub = 'den menstruace';
+    } else if (info.daysUntil != null && info.daysUntil < 0) {
+      big = String(-info.daysUntil);
+      sub = plural(-info.daysUntil, 'den', 'dny', 'dní') + ' zpoždění';
+    } else if (info.daysUntil != null) {
+      big = String(info.daysUntil);
+      sub = plural(info.daysUntil, 'den', 'dny', 'dní') + ' do menstruace';
+    }
+  } else if (info) sub = 'Zapište začátek';
+  const n = 28;
+  return (
+    <TileShell title={'Cyklus'} label={'Cyklus' + (big ? ', ' + big + ' ' + sub : ', ' + sub)} onPress={onPress}>
+      <View style={{ position: 'absolute', left: 0, right: 0, top: 46, alignItems: 'center' }}>
+        <View style={{ width: 112, height: 112, alignItems: 'center', justifyContent: 'center' }}>
+          {Array.from({ length: n }, (_, i) => {
+            const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+            const day = i + 1;
+            const today = info?.day ?? -1;
+            const c = day === today ? C.ink : info && day <= info.periodLength ? CY.pink : info && day >= info.fertileFrom && day <= info.fertileTo ? CY.lilac : '#E6E5E2';
+            return <View key={i} style={{ position: 'absolute', left: 56 + 50 * Math.cos(a) - 3, top: 56 + 50 * Math.sin(a) - 3, width: 6, height: 6, borderRadius: 3, backgroundColor: c }} />;
+          })}
+          <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: CY.pinkTint, alignItems: 'center', justifyContent: 'center' }}>
+            {big ? <T w="semibold" style={{ fontSize: 26, lineHeight: 30, letterSpacing: -0.8 }}>{big}</T> : <IconPlus size={18} color={CY.pink} />}
+          </View>
+        </View>
+      </View>
+      <View style={{ position: 'absolute', left: 8, right: 8, bottom: 8, height: 40, paddingHorizontal: 12, borderRadius: 18, backgroundColor: C.white, justifyContent: 'center' }}>
+        <T w="semibold" numberOfLines={1} style={{ fontSize: 12, lineHeight: 16, color: C.ink2 }}>{sub}</T>
       </View>
     </TileShell>
   );

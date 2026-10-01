@@ -61,6 +61,8 @@ export function TypeGlyph({ type, size = 15, color, mouth }: { type: string; siz
       return <S {...p}><Path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><Path d="M14 3v5h5" /><Path d="M9 13h6M9 17h4" /></S>;
     case 'note':
       return <S {...p}><Path d="M4 20h4L19 9l-4-4L4 16z" /><Path d="M13.5 6.5l4 4" /></S>;
+    case 'cycle':
+      return <S {...p}><Path d="M12 3.5c3.2 4 5.5 7.3 5.5 10.2A5.5 5.5 0 0 1 6.5 13.7C6.5 10.8 8.8 7.5 12 3.5z" /></S>;
     case 'event':
       return <S {...p}><Rect x="4" y="5" width="16" height="15" rx="3" /><Path d="M4 10h16M9 3v4M15 3v4" /></S>;
     case 'mood':

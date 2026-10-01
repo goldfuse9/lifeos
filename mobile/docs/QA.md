@@ -59,3 +59,16 @@ Položky „Připravujeme“ musí ukázat hlášku, že přijdou s online verz�
 
 Já → Zabezpečení → Smazat vše → potvrdit 2× → úvodní obrazovka; nový účet
 nesmí vidět nic ze starého.
+
+## F. Cyklus
+
+| Test | Očekávání |
+| --- | --- |
+| Osobní údaje → pohlaví Žena | Na Přehledu dlaždice Cyklus „Nastavit sledování“ |
+| Cyklus → zadat začátek, délku, Začít sledovat | Kruh s počtem dní do menstruace, fáze, pás dní s DNES |
+| Začala menstruace → krvácení, bolest, příznaky → Zapsat | V ose záznam „Začátek menstruace“ s Krvácení, Příznaky, Bolest, Posun |
+| Druhý den Zapsat dnešek | „Menstruace · 2. den“ |
+| Záznam v ose → Upravit | Otevře se zápis cyklu, ne obecný formulář |
+| Upravit cyklus → Nepravidelný | Odhad jako rozmezí |
+| Upravit cyklus → Nezobrazovat na Přehledu | Dlaždice zmizí, cyklus zůstane v Já → Cyklus |
+| Přestat sledovat | Zápisy v ose zůstanou |

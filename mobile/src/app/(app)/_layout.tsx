@@ -17,6 +17,9 @@ export default function AppLayout() {
       <Stack.Screen name="dokumenty" />
       <Stack.Screen name="nouze" />
       <Stack.Screen name="lekari" />
+      <Stack.Screen name="cyklus/index" />
+      <Stack.Screen name="cyklus/zapis" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+      <Stack.Screen name="cyklus/nastaveni" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
       <Stack.Screen name="zaznam/[id]" />
       <Stack.Screen name="zaznam/upravit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
       <Stack.Screen name="priloha/[id]" options={{ presentation: 'fullScreenModal', animation: 'fade' }} />

@@ -16,6 +16,7 @@ import type {
   Relation,
 } from '@/domain/types';
 import { DEFAULT_SETTINGS } from '@/domain/types';
+import type { CycleSettings } from '@/domain/cycle';
 
 /**
  * Repozitáře — jediné místo, které zná SQL. Služby a obrazovky pracují
@@ -318,8 +319,8 @@ export class AttachmentRepository {
   }
 }
 
-export type PersonSection = 'personal' | 'emergency' | 'doctors';
-type SectionData = { personal: PersonalData; emergency: EmergencyData; doctors: DoctorList };
+export type PersonSection = 'personal' | 'emergency' | 'doctors' | 'cycle';
+type SectionData = { personal: PersonalData; emergency: EmergencyData; doctors: DoctorList; cycle: CycleSettings };
 
 export class PersonDataRepository {
   constructor(private db: SqlDriver, private clock: Clock) {}

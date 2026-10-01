@@ -9,7 +9,7 @@ import { emergencyProgress } from '@/domain/emergency';
 import { ageLabel, ageOn, toLocalDate } from '@/domain/dates';
 import { buildExport } from '@/services/export';
 import { cacheFile, removeCacheFile } from '@/platform/files';
-import { Avatar, Backdrop, Card, Divider, H1, Muted, PillButton, Row, SecondaryButton, T, ToggleRow, useScreenInsets, useToast } from '@/ui/kit';
+import { Avatar, Backdrop, Card, Divider, H1, Muted, PillButton, Row, SecondaryButton, T, useScreenInsets, useToast } from '@/ui/kit';
 import { confirm } from '@/ui/device';
 import { C } from '@/ui/theme';
 import { IconClose, IconPlus } from '@/ui/icons';
@@ -118,12 +118,15 @@ export default function Settings() {
               <Row title="Upravit nebo odebrat kartu" sub="Jméno, vztah, datum narození" onPress={() => router.push({ pathname: '/nastaveni/karta', params: { id: person.id } })} />
             </>
           ) : null}
-          {isSelf ? (
-            <>
-              <Divider />
-              <ToggleRow title="Sledovat cyklus" sub="V zápisu příznaků se objeví sekce Cyklus" value={s.settings.cycleTracking} onChange={(v) => s.updateSettings({ cycleTracking: v })} />
-            </>
-          ) : null}
+          <Divider />
+          <Row
+            title="Cyklus"
+            sub="Menstruace, odhad, zápisy do osy"
+            onPress={() => {
+              router.back();
+              router.push('/cyklus');
+            }}
+          />
         </Group>
 
         <Group title="Zdraví" dot="#9B3FE0">

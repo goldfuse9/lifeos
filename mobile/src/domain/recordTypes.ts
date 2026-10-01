@@ -23,10 +23,11 @@ export const RECORD_TYPES: Record<RecordType, RecordTypeInfo> = {
   doc: { label: 'Dokument', plural: 'Dokumenty', color: '#E0613B', text: '#A8412A', tint: '#FDECE6' },
   note: { label: 'Poznámka', plural: 'Poznámky', color: '#7A7682', text: '#5E5B66', tint: '#EFEEF1' },
   mood: { label: 'Nálada', plural: 'Nálady', color: '#E8830C', text: '#945000', tint: '#FFF1E0' },
+  cycle: { label: 'Cyklus', plural: 'Cyklus', color: '#E0457B', text: '#A3265A', tint: '#FCE4EE' },
 };
 
 /** Pořadí v nabídce „Nový záznam“ a ve filtru. */
-export const RECORD_TYPE_ORDER: RecordType[] = ['event', 'visit', 'symptom', 'result', 'med', 'doc', 'note', 'mood'];
+export const RECORD_TYPE_ORDER: RecordType[] = ['event', 'visit', 'symptom', 'result', 'med', 'doc', 'note', 'mood', 'cycle'];
 
 /** Typy, které lze vytvořit obecným formulářem (nálada má vlastní zápis). */
 export const EDITABLE_TYPES: RecordType[] = ['event', 'visit', 'symptom', 'result', 'med', 'doc', 'note'];
