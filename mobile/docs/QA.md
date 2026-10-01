@@ -66,8 +66,9 @@ nesmí vidět nic ze starého.
 | --- | --- |
 | Osobní údaje → pohlaví Žena | Na Přehledu dlaždice Cyklus „Nastavit sledování“ |
 | Cyklus → zadat začátek, délku, Začít sledovat | Kruh s počtem dní do menstruace, fáze, pás dní s DNES |
-| Začala menstruace → krvácení, bolest, příznaky → Zapsat | V ose záznam „Začátek menstruace“ s Krvácení, Příznaky, Bolest, Posun |
-| Druhý den Zapsat dnešek | „Menstruace · 2. den“ |
+| Zapsat → Tento den začala menstruace, krvácení, bolest, příznaky → Zapsat | V ose záznam „Začátek menstruace“ s Krvácení, Příznaky, Bolest, Posun |
+| Druhý den Zapsat | „Menstruace · 2. den“ |
+| Dnes → klepnout na příznak (např. Křeče) | Hned v ose v dnešním zápisu cyklu; druhé klepnutí ho odebere |
 | Záznam v ose → Upravit | Otevře se zápis cyklu, ne obecný formulář |
 | Upravit cyklus → Nepravidelný | Odhad jako rozmezí |
 | Upravit cyklus → Nezobrazovat na Přehledu | Dlaždice zmizí, cyklus zůstane v Já → Cyklus |

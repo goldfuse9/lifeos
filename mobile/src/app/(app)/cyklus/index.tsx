@@ -4,9 +4,9 @@ import { router } from 'expo-router';
 import { useData, usePerson, useSession } from '@/state/session';
 import { useCycle } from '@/state/useCycle';
 import { useNow } from '@/state/useLoad';
-import { CYCLE_DEFAULTS, PAIN_LABEL, cycleLogOf, FLOW_LABEL, type CycleSettings } from '@/domain/cycle';
-import { MONTHS_GEN, parseLocalDate, plural, shortDate, toLocalDate, addDays } from '@/domain/dates';
-import { Backdrop, BottomFade, Callout, Card, Divider, H1, Loading, Muted, Note, PrimaryButton, Row, SecondaryButton, T, ToggleRow, TopBar, useScreenInsets, useToast } from '@/ui/kit';
+import { CYCLE_DEFAULTS, CYCLE_SYMPTOMS, PAIN_LABEL, buildCycleRecord, cycleLogOf, type CycleLog, type CycleSettings } from '@/domain/cycle';
+import { plural, shortDate, toLocalDate, addDays } from '@/domain/dates';
+import { Backdrop, BottomFade, Callout, Card, Chip, Divider, H1, Loading, Muted, Note, PrimaryButton, Row, SecondaryButton, T, ToggleRow, TopBar, useScreenInsets, useToast } from '@/ui/kit';
 import { ActionFab, MeFab } from '@/ui/fabs';
 import { DateField } from '@/ui/DateTimeField';
 import { CardLabel, CY, CycleRing, DayStrip, Stepper } from '@/ui/cycleViz';
@@ -23,6 +23,10 @@ export default function Cyklus() {
   const person = usePerson();
   const { settings, info, records, loading } = useCycle();
   const today = toLocalDate(useNow());
+  const data = useData();
+  const { touch } = useSession();
+  const toast = useToast();
+  const [pending, setPending] = useState<string[] | null>(null);
 
   if (loading && !info) {
     return (
@@ -41,7 +45,30 @@ export default function Cyklus() {
   const todayLog = records.find((r) => r.date === today && r.type === 'cycle');
   const todayC = todayLog ? cycleLogOf(todayLog) : null;
   const goLog = (params?: Record<string, string>) => router.push({ pathname: '/cyklus/zapis', params });
-  const monthName = (d: string) => parseLocalDate(d).getDate() + '. ' + MONTHS_GEN[parseLocalDate(d).getMonth()];
+  const todaySymptoms = pending ?? todayC?.symptoms ?? [];
+
+  // Přepnutí příznaku uloží dnešní zápis cyklu (vytvoří, upraví, nebo smaže prázdný).
+  const toggleSymptom = async (sym: string) => {
+    const next = todaySymptoms.includes(sym) ? todaySymptoms.filter((x) => x !== sym) : [...todaySymptoms, sym];
+    setPending(next);
+    try {
+      const log: CycleLog = { ...(todayC ?? {}), symptoms: next, day: todayC?.day ?? info.day ?? undefined };
+      const note = todayLog?.description ?? '';
+      if (todayLog && !log.start && !log.flow && !log.pain && !next.length && !note.trim()) {
+        await data.records.softDelete(todayLog.id);
+      } else {
+        const built = buildCycleRecord(log, note);
+        const fields = { type: 'cycle' as const, title: built.title, description: built.description, date: today, time: null, metadata: built.metadata };
+        if (todayLog) await data.records.update(todayLog.id, fields);
+        else await data.records.create(person.id, fields);
+      }
+      touch();
+    } catch {
+      toast('Zápis se nepovedl');
+    } finally {
+      setPending(null);
+    }
+  };
 
   const phaseTitle = info.day == null ? 'Zapište první den menstruace' : info.phase === 'zpoždění' ? `${info.day}. den cyklu · zpoždění` : `Dnes · ${info.day}. den cyklu`;
   const phaseSub =
@@ -58,18 +85,7 @@ export default function Cyklus() {
       <Backdrop />
       <ScrollView contentContainerStyle={{ paddingTop: ins.top, paddingHorizontal: 16, paddingBottom: ins.bottom }}>
         <TopBar title={person.name} backLabel="Zpět na přehled" />
-        <View style={{ marginTop: 18, paddingLeft: 8 }}>
-          <H1>Cyklus</H1>
-          <Muted style={{ marginTop: 4 }}>
-            {info.nextStart
-              ? info.irregular && info.nextRange
-                ? `Další menstruace odhadem ${monthName(info.nextRange[0])} – ${monthName(info.nextRange[1])}`
-                : `Další menstruace odhadem ${monthName(info.nextStart)}`
-              : 'Odhad se spočítá z vašich zápisů'}
-          </Muted>
-        </View>
-
-        <View style={{ marginTop: 8 }}>
+        <View style={{ marginTop: 36, marginBottom: 36 }}>
           <CycleRing info={info} />
         </View>
 
@@ -82,32 +98,14 @@ export default function Cyklus() {
           <T style={{ marginTop: 10, fontSize: 12, lineHeight: 16, color: C.muted }}>Plodné dny jsou odhad z délky cyklu. Nejsou spolehlivou antikoncepcí.</T>
         </Card>
 
-        {/* Dnešní zápis */}
+        {/* Dnes — jen menstruační příznaky, klepnutí rovnou zapíše do osy */}
         <Card white style={{ marginTop: 12, padding: 16, borderRadius: 28 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <CardLabel>Dnes</CardLabel>
-            <Pressable accessibilityRole="button" accessibilityLabel="Zapsat dnešek" onPress={() => goLog(todayLog ? { id: todayLog.id } : undefined)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.chip, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center' }}>
-              <IconPlus size={16} />
-            </Pressable>
-          </View>
-          {todayC ? (
-            <Pressable accessibilityRole="button" onPress={() => goLog({ id: todayLog!.id })}>
-              <T w="semibold" style={{ marginTop: 6, fontSize: 18, lineHeight: 24 }}>{todayLog!.title}</T>
-              <Muted>{[todayC.flow ? 'Krvácení: ' + FLOW_LABEL[todayC.flow].toLowerCase() : null, todayC.pain ? 'bolest ' + PAIN_LABEL[todayC.pain].toLowerCase() : null, todayC.symptoms?.length ? todayC.symptoms.join(', ') : null].filter(Boolean).join(' · ') || 'Bez podrobností'}</Muted>
-            </Pressable>
-          ) : (
-            <>
-              <T w="semibold" style={{ marginTop: 6, fontSize: 18, lineHeight: 24 }}>Jak to dnes vypadá?</T>
-              <Muted>Krvácení, bolest a příznaky — zapíše se do časové osy.</Muted>
-            </>
-          )}
-          <View style={{ marginTop: 14, flexDirection: 'row', gap: 8 }}>
-            {!info.inPeriod && !todayC?.start ? (
-              <PrimaryButton style={{ flex: 1, minHeight: 48 }} label="Začala menstruace" onPress={() => goLog({ start: '1' })} />
-            ) : (
-              <PrimaryButton style={{ flex: 1, minHeight: 48 }} label={todayC ? 'Upravit dnešek' : 'Zapsat dnešek'} onPress={() => goLog(todayLog ? { id: todayLog.id } : undefined)} />
-            )}
-            <SecondaryButton style={{ flex: 1, minHeight: 48 }} label="Příznaky" onPress={() => router.push('/zapis')} />
+          <CardLabel>Dnes</CardLabel>
+          <T w="semibold" style={{ marginTop: 6, fontSize: 18, lineHeight: 24 }}>{todaySymptoms.length ? todaySymptoms.length + ' ' + plural(todaySymptoms.length, 'příznak', 'příznaky', 'příznaků') : 'Máte nějaké potíže?'}</T>
+          <View style={{ marginTop: 12, flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+            {CYCLE_SYMPTOMS.map((sym) => (
+              <Chip key={sym} tone="orange" label={sym} selected={todaySymptoms.includes(sym)} onPress={() => toggleSymptom(sym)} />
+            ))}
           </View>
         </Card>
 
