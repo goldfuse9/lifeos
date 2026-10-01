@@ -110,6 +110,8 @@ export interface PersonalData {
   firstName?: string;
   lastName?: string;
   birthDate?: string;
+  /** Rodné číslo (rrmmdd/xxxx). */
+  rc?: string;
   sex?: 'žena' | 'muž' | 'jiné';
   insurer?: string;
   insuranceNo?: string;
@@ -121,6 +123,16 @@ export interface PersonalData {
   smoking?: string;
   alcohol?: string;
   activity?: string;
+}
+
+/** Doklady karty — průkaz pojištěnce (fotky jsou přílohy záznamu typu doklad). */
+export interface DocsData {
+  /** Záznam „Průkaz pojištěnce“, ke kterému patří fotky líce a rubu. */
+  cardRecordId?: string;
+  frontId?: string;
+  backId?: string;
+  /** Platnost kartičky, MM/RR. */
+  validUntil?: string;
 }
 
 /** Nouzové údaje — co se ukáže na nouzové kartě. */

@@ -6,7 +6,7 @@ import { useLoad } from '@/state/useLoad';
 import { formatSize, numericDate, plural, toLocalDate, toLocalTime } from '@/domain/dates';
 import type { RecordType } from '@/domain/types';
 import { Backdrop, BottomFade, H1, Muted, Note, Segmented, T, TopBar, useScreenInsets, useToast, useUi } from '@/ui/kit';
-import { ActionFab, MeFab, SearchFab } from '@/ui/fabs';
+import { ActionFab, SearchPill } from '@/ui/fabs';
 import { AttachmentPreview } from '@/ui/records';
 import { chooseSource, pickFrom } from '@/ui/device';
 import { C, F } from '@/ui/theme';
@@ -96,7 +96,7 @@ export default function Dokumenty() {
     <View style={{ flex: 1 }}>
       <Backdrop />
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: ins.top, paddingHorizontal: 16, paddingBottom: ins.bottom }}>
-        <TopBar title={person.name} backLabel="Zpět na přehled" />
+        <TopBar title={person.name} backLabel="Zpět na přehled" extra={<SearchPill label="Hledat v dokumentech" active={!!q} onPress={() => setSearchOpen((o) => !o)} />} />
         <View style={{ marginTop: 18, paddingLeft: 8 }}>
           <H1>Dokumenty</H1>
           <Muted style={{ marginTop: 4 }}>{all.length + ' ' + plural(all.length, 'soubor', 'soubory', 'souborů')} · jen v tomto telefonu</Muted>
@@ -152,8 +152,6 @@ export default function Dokumenty() {
 
       <BottomFade />
       <ActionFab label={busy ? 'Ukládám…' : 'Nahrát'} onPress={busy ? () => {} : upload} />
-      <SearchFab label="Hledat v dokumentech" active={!!q} onPress={() => setSearchOpen((o) => !o)} />
-      <MeFab label="Zpět na přehled" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
     </View>
   );
 }

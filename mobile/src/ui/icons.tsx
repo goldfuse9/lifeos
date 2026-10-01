@@ -34,6 +34,7 @@ export const IconFingerprint = (p: P) => <S {...p}><Path d="M12 11v3a8 8 0 0 1-1
 export const IconExport = (p: P) => <S {...p}><Path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" /></S>;
 export const IconCheck = (p: P) => <S {...p}><Path d="M5 12.5l4.5 4.5L19 7.5" /></S>;
 export const IconWarn = (p: P) => <S {...p}><Path d="M12 4 2.5 20h19z" /><Path d="M12 10v4M12 17.2v.1" /></S>;
+export const IconBolt = (p: P) => <S {...p}><Path d="M13 3 5 13.5h6L10 21l8-10.5h-6z" /></S>;
 export const IconFilter = (p: P) => <S {...p}><Path d="M4 6h16M7 12h10M10 18h4" /></S>;
 
 export const IconMoodFab = (p: P) => (

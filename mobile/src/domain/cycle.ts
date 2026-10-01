@@ -1,5 +1,6 @@
 import type { HcRecord, LocalDate } from './types';
 import { addDays, diffDays, plural } from './dates';
+import { MOODS } from './recordTypes';
 
 /**
  * Menstruační cyklus — čisté výpočty bez I/O.
@@ -37,6 +38,8 @@ export interface CycleSettings {
   irregular?: boolean;
   /** Nezobrazovat dlaždici na Přehledu (diskrétnost). */
   hideOnOverview?: boolean;
+  /** Režim: běžný cyklus, nebo těhotenství (odhady menstruace se nepočítají). */
+  mode?: 'cyklus' | 'těhotenství';
 }
 
 export const CYCLE_DEFAULTS = { cycleLength: 28, periodLength: 5 };
@@ -49,6 +52,8 @@ export interface CycleLog {
   /** Bolest 0–3. */
   pain?: number;
   symptoms?: string[];
+  /** Nálada — index do MOODS (0 = velmi špatně … 4 = výborně). */
+  mood?: number;
   /** Den cyklu v okamžiku zápisu. */
   day?: number;
   /** U začátku: o kolik dní později (+) / dříve (−) než odhad. */
@@ -244,6 +249,7 @@ export function buildCycleRecord(log: CycleLog, note: string): { title: string; 
   if (log.flow) children.push({ label: 'Krvácení', value: FLOW_LABEL[log.flow], type: 'cycle' });
   if (log.symptoms && log.symptoms.length) children.push({ label: 'Příznaky', value: log.symptoms.join(', '), type: 'symptom' });
   if (log.pain) children.push({ label: 'Bolest', value: PAIN_LABEL[log.pain], type: 'symptom' });
+  if (log.mood != null && MOODS[log.mood]) children.push({ label: 'Nálada', value: MOODS[log.mood].label, type: 'note' });
   if (log.start && log.shift != null) children.push({ label: 'Posun', value: shiftLabel(log.shift), type: 'note' });
   const title = log.start
     ? 'Začátek menstruace'

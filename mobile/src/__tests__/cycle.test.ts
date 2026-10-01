@@ -60,3 +60,9 @@ test('záznam do osy', () => {
   expect((r.metadata.children as { label: string }[]).map((c) => c.label)).toEqual(['Krvácení', 'Příznaky', 'Bolest', 'Posun']);
   expect(buildCycleRecord({ flow: 'light', day: 3 }, '').title).toBe('Menstruace · 3. den');
 });
+
+test('nálada se propíše do osy', () => {
+  const r = buildCycleRecord({ mood: 1, day: 5 }, '');
+  expect(r.title).toBe('Cyklus · 5. den');
+  expect(r.metadata.children).toEqual([{ label: 'Nálada', value: 'Špatně', type: 'note' }]);
+});

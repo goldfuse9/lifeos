@@ -7,7 +7,7 @@ import { RECORD_TYPES } from '@/domain/recordTypes';
 import { isUpcoming, recordSubtitle } from '@/domain/timeline';
 import { MONTHS_SHORT, WEEKDAYS_SHORT, addDays, longDate, parseLocalDate, plural, relativeDays, startOfWeek, toLocalDate, toLocalTime, vocative } from '@/domain/dates';
 import { Backdrop, BottomFade, Card, DateBadge, Muted, PillButton, T, Tile, useScreenInsets, useUi } from '@/ui/kit';
-import { MeFab, MoodFab } from '@/ui/fabs';
+import { FabMenu } from '@/ui/fabs';
 import { PrehledSearch } from '@/ui/PrehledSearch';
 import { useCycle } from '@/state/useCycle';
 import { CY } from '@/ui/cycleViz';
@@ -34,6 +34,7 @@ export default function Prehled() {
   const [openUp, setOpenUp] = useState(false);
   const [openRec, setOpenRec] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const cycle = useCycle();
   const showCycle = (!!cycle.settings.enabled && !cycle.settings.hideOnOverview) || cycle.suggest;
 
@@ -105,7 +106,7 @@ export default function Prehled() {
         {/* Dlaždice — vodorovný pás jako na desce (zoom 0,85 → 197 × 207) */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} snapToInterval={207} decelerationRate="fast" style={{ marginTop: 12, marginHorizontal: -16 }} contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 4, gap: 10 }}>
           <TileTimeline onPress={() => router.push('/osa')} />
-          {showCycle ? <TileCycle info={cycle.settings.enabled ? cycle.info : null} onPress={() => router.push('/cyklus')} /> : null}
+          {showCycle ? <TileCycle info={cycle.settings.enabled && cycle.settings.mode !== 'těhotenství' ? cycle.info : null} pregnant={cycle.settings.enabled && cycle.settings.mode === 'těhotenství'} onPress={() => router.push('/cyklus')} /> : null}
           <TileDoctors onPress={() => router.push('/lekari')} />
           <TileDocs count={value?.docs ?? 0} onPress={() => router.push('/dokumenty')} />
         </ScrollView>
@@ -228,9 +229,8 @@ export default function Prehled() {
       </ScrollView>
 
       <BottomFade />
-      {!searchOpen ? <MoodFab onPress={() => router.push('/zapis')} /> : null}
-      {!searchOpen ? <MeFab onPress={() => router.push('/nastaveni')} /> : null}
-      <PrehledSearch open={searchOpen} onOpen={() => setSearchOpen(true)} onClose={() => setSearchOpen(false)} />
+      {!searchOpen ? <FabMenu open={menuOpen} onOpenChange={setMenuOpen} onMood={() => router.push('/zapis')} onMe={() => router.push('/nastaveni')} /> : null}
+      <PrehledSearch revealed={menuOpen} open={searchOpen} onOpen={() => setSearchOpen(true)} onClose={() => setSearchOpen(false)} />
     </View>
   );
 }
@@ -301,10 +301,11 @@ function TileDoctors({ onPress }: { onPress: () => void }) {
   );
 }
 
-function TileCycle({ info, onPress }: { info: CycleInfo | null; onPress: () => void }) {
+function TileCycle({ info, pregnant, onPress }: { info: CycleInfo | null; pregnant?: boolean; onPress: () => void }) {
   let big = '';
   let sub = 'Nastavit sledování';
-  if (info?.hasData && info.day != null) {
+  if (pregnant) sub = 'Těhotenství';
+  else if (info?.hasData && info.day != null) {
     if (info.inPeriod) {
       big = info.day + '.';
       sub = 'den menstruace';

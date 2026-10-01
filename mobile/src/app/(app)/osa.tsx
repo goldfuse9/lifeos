@@ -9,7 +9,7 @@ import { daySummary, ensureToday, groupByDay, nowLineIndex, type TimelineDay } f
 import { plural, toLocalDate, toLocalTime } from '@/domain/dates';
 import type { Attachment, HcRecord, RecordType } from '@/domain/types';
 import { Backdrop, BottomFade, Chip, H1, Muted, SecondaryButton, T, TopBar, useScreenInsets, useUi } from '@/ui/kit';
-import { ActionFab, MeFab, MoodFab, SearchFab } from '@/ui/fabs';
+import { ActionFab, SearchPill } from '@/ui/fabs';
 import { RecordCard } from '@/ui/records';
 import { C, F } from '@/ui/theme';
 import { IconClose, IconFilter, IconSearch } from '@/ui/icons';
@@ -180,7 +180,7 @@ export default function Osa() {
         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: ins.top + 190 }}
       />
       <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0, paddingTop: ins.top, paddingHorizontal: 16 }}>
-        <TopBar title={person.name} backLabel="Zpět na přehled" />
+        <TopBar title={person.name} backLabel="Zpět na přehled" extra={<SearchPill label="Hledat a filtrovat" active={filtering} onPress={() => setSearchOpen(true)} />} />
         <View pointerEvents="none" style={{ marginTop: 18, paddingLeft: 8 }}>
           <H1>{filtering ? 'Hledání' : head?.title ?? 'Dnes'}</H1>
           <Muted style={{ marginTop: 4 }}>
@@ -254,10 +254,7 @@ export default function Osa() {
         </KeyboardAvoidingView>
       ) : (
         <>
-          <ActionFab label="Záznam" a11y="Nový záznam" onPress={() => router.push({ pathname: '/zaznam/upravit', params: { date: today } })} />
-          <MoodFab onPress={() => router.push('/zapis')} />
-          <SearchFab label="Hledat a filtrovat" active={filtering} onPress={() => setSearchOpen(true)} />
-          <MeFab label="Zpět na přehled" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+          <ActionFab label="Zapsat" a11y="Nový záznam" onPress={() => router.push({ pathname: '/zaznam/upravit', params: { date: today } })} />
         </>
       )}
       {/* Po změně hledání nebo filtru zpátky nahoru */}

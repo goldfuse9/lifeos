@@ -161,13 +161,14 @@ export function PillButton({ children, style, ...rest }: BtnProps & { children: 
 }
 
 /** Hlavička podstránek: zpět vlevo, jméno karty vpravo. */
-export function TopBar({ title, right, onBack, backLabel = 'Zpět' }: { title?: string; right?: React.ReactNode; onBack?: () => void; backLabel?: string }) {
+export function TopBar({ title, right, extra, onBack, backLabel = 'Zpět' }: { title?: string; right?: React.ReactNode; extra?: React.ReactNode; onBack?: () => void; backLabel?: string }) {
   const ui = useUi();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 44 }}>
       <PillButton accessibilityRole="button" accessibilityLabel={backLabel} onPress={onBack ?? (() => (router.canGoBack() ? router.back() : router.replace('/')))}>
         <IconBack color={C.muted} />
       </PillButton>
+      {extra ? <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', paddingRight: 8 }}>{extra}</View> : null}
       {right ??
         (title ? (
           <View accessibilityRole="text" style={{ height: 44, paddingHorizontal: 18, borderRadius: 22, backgroundColor: ui.pill, justifyContent: 'center' }}>

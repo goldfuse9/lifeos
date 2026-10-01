@@ -23,7 +23,7 @@ import { IconClose, IconSearch } from './icons';
 const MAX_RESULTS = 5;
 const MAX_RECENT = 5;
 
-export function PrehledSearch({ open, onOpen, onClose }: { open: boolean; onOpen: () => void; onClose: () => void }) {
+export function PrehledSearch({ open, onOpen, onClose, revealed = true }: { open: boolean; onOpen: () => void; onClose: () => void; revealed?: boolean }) {
   const data = useData();
   const person = usePerson();
   const { settings, updateSettings } = useSession();
@@ -31,6 +31,8 @@ export function PrehledSearch({ open, onOpen, onClose }: { open: boolean; onOpen
   const { width: screenW } = useWindowDimensions();
   const [q, setQ] = useState('');
   const anim = useAnimatedValue(open ? 1 : 0);
+  // Vysunutí z rozbalovacího menu (zelené tlačítko).
+  const rev = useAnimatedValue(revealed ? 1 : 0);
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -38,6 +40,10 @@ export function PrehledSearch({ open, onOpen, onClose }: { open: boolean; onOpen
       if (open) inputRef.current?.focus();
     });
   }, [open, anim]);
+
+  useEffect(() => {
+    Animated.timing(rev, { toValue: revealed ? 1 : 0, duration: 260, easing: Easing.bezier(0.2, 0.8, 0.2, 1), useNativeDriver: false }).start();
+  }, [revealed, rev]);
 
   const query = q.trim();
   const { value } = useLoad(async () => (query.length >= 1 && open ? data.records.query({ personId: person.id, text: query, limit: 51 }) : []), [query, person.id, open]);
@@ -117,10 +123,10 @@ export function PrehledSearch({ open, onOpen, onClose }: { open: boolean; onOpen
           ) : null}
 
           {/* Lišta — roste z růžového tlačítka */}
-          <View style={{ height: 56 + bottom }} pointerEvents="box-none">
+          <View style={{ height: 56 + bottom }} pointerEvents={open || revealed ? 'box-none' : 'none'}>
             <Animated.View
               style={{
-                position: 'absolute', bottom, right, width, height: 56, borderRadius: 28, overflow: 'hidden',
+                position: 'absolute', bottom, right: Animated.add(right, rev.interpolate({ inputRange: [0, 1], outputRange: [-64, 0] })), width, opacity: rev, height: 56, borderRadius: 28, overflow: 'hidden',
                 backgroundColor: open ? 'rgba(255,255,255,0.95)' : 'transparent',
                 borderWidth: 1, borderColor: open ? C.line : 'rgba(255,255,255,0.35)',
                 boxShadow: open ? '0px 20px 48px rgba(40,40,40,0.12)' : '0px 12px 32px rgba(238,63,122,0.40)',

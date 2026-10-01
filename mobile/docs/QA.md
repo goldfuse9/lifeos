@@ -66,10 +66,21 @@ nesmí vidět nic ze starého.
 | --- | --- |
 | Osobní údaje → pohlaví Žena | Na Přehledu dlaždice Cyklus „Nastavit sledování“ |
 | Cyklus → zadat začátek, délku, Začít sledovat | Kruh s počtem dní do menstruace, fáze, pás dní s DNES |
-| Zapsat → Tento den začala menstruace, krvácení, bolest, příznaky → Zapsat | V ose záznam „Začátek menstruace“ s Krvácení, Příznaky, Bolest, Posun |
+| Zapsat → Krvácení (síla + Tento den začala), Nálada, Bolest (síla + příznaky) → Zapsat | V ose záznam „Začátek menstruace“ s Krvácení, Příznaky, Bolest, Posun |
 | Druhý den Zapsat | „Menstruace · 2. den“ |
-| Dnes → klepnout na příznak (např. Křeče) | Hned v ose v dnešním zápisu cyklu; druhé klepnutí ho odebere |
 | Záznam v ose → Upravit | Otevře se zápis cyklu, ne obecný formulář |
+| Doplňující údaje → režim Těhotenství | Místo kruhu karta „Odhady pozastavené“, dlaždice „Těhotenství“ |
 | Upravit cyklus → Nepravidelný | Odhad jako rozmezí |
 | Upravit cyklus → Nezobrazovat na Přehledu | Dlaždice zmizí, cyklus zůstane v Já → Cyklus |
 | Přestat sledovat | Zápisy v ose zůstanou |
+
+## G. Spodní menu a nastavení
+
+| Test | Očekávání |
+| --- | --- |
+| Přehled: klepnout na zelené | Vysune se oranžová (nálada) a růžová (hledání) |
+| Nechat 5 s / klepnout jinam | Menu se sbalí, zůstane zelené |
+| Rozbalené → znovu zelené | Otevře se Já |
+| Osa, Cyklus, Dokumenty | Vpravo dole jen černé „+ Zapsat“ / „+ Nahrát“, hledání je v hlavičce |
+| Já → Osobní údaje | Stav „Chybí n údajů“, BMI z výšky a váhy |
+| Já → Doklady → Líc/Rub vyfotit | Kartička „Nahráno ✓“, fotka i v Dokumentech → Doklady |

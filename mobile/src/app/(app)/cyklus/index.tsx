@@ -4,10 +4,10 @@ import { router } from 'expo-router';
 import { useData, usePerson, useSession } from '@/state/session';
 import { useCycle } from '@/state/useCycle';
 import { useNow } from '@/state/useLoad';
-import { CYCLE_DEFAULTS, CYCLE_SYMPTOMS, PAIN_LABEL, buildCycleRecord, cycleLogOf, type CycleLog, type CycleSettings } from '@/domain/cycle';
+import { CYCLE_DEFAULTS, PAIN_LABEL, type CycleSettings } from '@/domain/cycle';
 import { plural, shortDate, toLocalDate, addDays } from '@/domain/dates';
-import { Backdrop, BottomFade, Callout, Card, Chip, Divider, H1, Loading, Muted, Note, PrimaryButton, Row, SecondaryButton, T, ToggleRow, TopBar, useScreenInsets, useToast } from '@/ui/kit';
-import { ActionFab, MeFab } from '@/ui/fabs';
+import { Backdrop, BottomFade, Callout, Card, Divider, H1, Loading, Muted, Note, PrimaryButton, Row, SecondaryButton, T, ToggleRow, TopBar, useScreenInsets, useToast } from '@/ui/kit';
+import { ActionFab } from '@/ui/fabs';
 import { DateField } from '@/ui/DateTimeField';
 import { CardLabel, CY, CycleRing, DayStrip, Stepper } from '@/ui/cycleViz';
 import { C } from '@/ui/theme';
@@ -23,10 +23,6 @@ export default function Cyklus() {
   const person = usePerson();
   const { settings, info, records, loading } = useCycle();
   const today = toLocalDate(useNow());
-  const data = useData();
-  const { touch } = useSession();
-  const toast = useToast();
-  const [pending, setPending] = useState<string[] | null>(null);
 
   if (loading && !info) {
     return (
@@ -43,33 +39,8 @@ export default function Cyklus() {
   if (!settings.enabled || !info) return <Setup initial={settings} />;
 
   const todayLog = records.find((r) => r.date === today && r.type === 'cycle');
-  const todayC = todayLog ? cycleLogOf(todayLog) : null;
+  const pregnant = settings.mode === 'těhotenství';
   const goLog = (params?: Record<string, string>) => router.push({ pathname: '/cyklus/zapis', params });
-  const todaySymptoms = pending ?? todayC?.symptoms ?? [];
-
-  // Přepnutí příznaku uloží dnešní zápis cyklu (vytvoří, upraví, nebo smaže prázdný).
-  const toggleSymptom = async (sym: string) => {
-    const next = todaySymptoms.includes(sym) ? todaySymptoms.filter((x) => x !== sym) : [...todaySymptoms, sym];
-    setPending(next);
-    try {
-      const log: CycleLog = { ...(todayC ?? {}), symptoms: next, day: todayC?.day ?? info.day ?? undefined };
-      const note = todayLog?.description ?? '';
-      if (todayLog && !log.start && !log.flow && !log.pain && !next.length && !note.trim()) {
-        await data.records.softDelete(todayLog.id);
-      } else {
-        const built = buildCycleRecord(log, note);
-        const fields = { type: 'cycle' as const, title: built.title, description: built.description, date: today, time: null, metadata: built.metadata };
-        if (todayLog) await data.records.update(todayLog.id, fields);
-        else await data.records.create(person.id, fields);
-      }
-      touch();
-    } catch {
-      toast('Zápis se nepovedl');
-    } finally {
-      setPending(null);
-    }
-  };
-
   const phaseTitle = info.day == null ? 'Zapište první den menstruace' : info.phase === 'zpoždění' ? `${info.day}. den cyklu · zpoždění` : `Dnes · ${info.day}. den cyklu`;
   const phaseSub =
     info.day == null
@@ -85,29 +56,29 @@ export default function Cyklus() {
       <Backdrop />
       <ScrollView contentContainerStyle={{ paddingTop: ins.top, paddingHorizontal: 16, paddingBottom: ins.bottom }}>
         <TopBar title={person.name} backLabel="Zpět na přehled" />
-        <View style={{ marginTop: 36, marginBottom: 36 }}>
-          <CycleRing info={info} />
-        </View>
+        {pregnant ? (
+          <Card white style={{ marginTop: 24, padding: 18, borderRadius: 28 }}>
+            <CardLabel icon={<TypeGlyph type="cycle" color={C.muted} size={13} />}>Těhotenství</CardLabel>
+            <T w="semibold" style={{ marginTop: 8, fontSize: 20, lineHeight: 26, letterSpacing: -0.4 }}>Odhady menstruace jsou pozastavené</T>
+            <Muted>Zápisy do osy fungují dál. Režim přepnete v Upravit cyklus nebo v Doplňujících údajích.</Muted>
+          </Card>
+        ) : (
+          <>
+            <View style={{ marginTop: 36, marginBottom: 36 }}>
+              <CycleRing info={info} />
+            </View>
 
-        {/* Fáze cyklu */}
-        <Card style={{ padding: 16, borderRadius: 28 }}>
-          <CardLabel icon={<TypeGlyph type="cycle" color={C.muted} size={13} />}>Fáze cyklu</CardLabel>
-          <T w="semibold" style={{ marginTop: 8, fontSize: 20, lineHeight: 26, letterSpacing: -0.4 }}>{phaseTitle}</T>
-          <Muted>{phaseSub}</Muted>
-          {info.day != null ? <DayStrip info={info} /> : null}
-          <T style={{ marginTop: 10, fontSize: 12, lineHeight: 16, color: C.muted }}>Plodné dny jsou odhad z délky cyklu. Nejsou spolehlivou antikoncepcí.</T>
-        </Card>
+            {/* Fáze cyklu */}
+            <Card style={{ padding: 16, borderRadius: 28 }}>
+              <CardLabel icon={<TypeGlyph type="cycle" color={C.muted} size={13} />}>Fáze cyklu</CardLabel>
+              <T w="semibold" style={{ marginTop: 8, fontSize: 20, lineHeight: 26, letterSpacing: -0.4 }}>{phaseTitle}</T>
+              <Muted>{phaseSub}</Muted>
+              {info.day != null ? <DayStrip info={info} /> : null}
+              <T style={{ marginTop: 10, fontSize: 12, lineHeight: 16, color: C.muted }}>Plodné dny jsou odhad z délky cyklu. Nejsou spolehlivou antikoncepcí.</T>
+            </Card>
 
-        {/* Dnes — jen menstruační příznaky, klepnutí rovnou zapíše do osy */}
-        <Card white style={{ marginTop: 12, padding: 16, borderRadius: 28 }}>
-          <CardLabel>Dnes</CardLabel>
-          <T w="semibold" style={{ marginTop: 6, fontSize: 18, lineHeight: 24 }}>{todaySymptoms.length ? todaySymptoms.length + ' ' + plural(todaySymptoms.length, 'příznak', 'příznaky', 'příznaků') : 'Máte nějaké potíže?'}</T>
-          <View style={{ marginTop: 12, flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-            {CYCLE_SYMPTOMS.map((sym) => (
-              <Chip key={sym} tone="orange" label={sym} selected={todaySymptoms.includes(sym)} onPress={() => toggleSymptom(sym)} />
-            ))}
-          </View>
-        </Card>
+          </>
+        )}
 
         {/* Bolest */}
         <Card style={{ marginTop: 12, padding: 16, borderRadius: 28 }}>
@@ -144,7 +115,7 @@ export default function Cyklus() {
           <Stat label="Pravidelnost" value={info.irregular ? 'nepravidelný' : 'pravidelný'} />
         </Card>
 
-        {info.warnings.length ? (
+        {info.warnings.length && !pregnant ? (
           <View style={{ marginTop: 12, gap: 8 }}>
             <Callout title="Stojí za to probrat s gynekologem">{info.warnings.join(' ')}</Callout>
             <SecondaryButton label="Moji lékaři" onPress={() => router.push('/lekari')} />
@@ -182,7 +153,6 @@ export default function Cyklus() {
       </ScrollView>
       <BottomFade />
       <ActionFab label="Zapsat" onPress={() => goLog(todayLog ? { id: todayLog.id } : undefined)} />
-      <MeFab label="Zpět na přehled" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
     </View>
   );
 }

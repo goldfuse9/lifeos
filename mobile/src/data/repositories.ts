@@ -3,6 +3,7 @@ import type {
   AppSettings,
   Attachment,
   AttachmentKind,
+  DocsData,
   DoctorList,
   EmergencyData,
   HcRecord,
@@ -319,8 +320,8 @@ export class AttachmentRepository {
   }
 }
 
-export type PersonSection = 'personal' | 'emergency' | 'doctors' | 'cycle';
-type SectionData = { personal: PersonalData; emergency: EmergencyData; doctors: DoctorList; cycle: CycleSettings };
+export type PersonSection = 'personal' | 'emergency' | 'doctors' | 'cycle' | 'docs';
+type SectionData = { personal: PersonalData; emergency: EmergencyData; doctors: DoctorList; cycle: CycleSettings; docs: DocsData };
 
 export class PersonDataRepository {
   constructor(private db: SqlDriver, private clock: Clock) {}

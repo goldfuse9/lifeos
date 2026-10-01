@@ -33,9 +33,21 @@ export default function Settings() {
   const today = toLocalDate(new Date());
 
   const { value } = useLoad(async () => {
-    const [em, doctors] = await Promise.all([data.personData.get(person.id, 'emergency'), data.personData.get(person.id, 'doctors')]);
-    return { em: emergencyProgress(em), doctors: doctors.list?.length ?? 0 };
-  }, [person.id]);
+    const [em, doctors, cycle, docs] = await Promise.all([
+      data.personData.get(person.id, 'emergency'),
+      data.personData.get(person.id, 'doctors'),
+      data.personData.get(person.id, 'cycle'),
+      data.personData.get(person.id, 'docs'),
+    ]);
+    const [front, back] = await Promise.all([docs.frontId ? data.attachments.get(docs.frontId) : null, docs.backId ? data.attachments.get(docs.backId) : null]);
+    const legacyCycle = isSelf && s.settings.cycleTracking && cycle.enabled === undefined;
+    return {
+      em: emergencyProgress(em),
+      doctors: doctors.list?.length ?? 0,
+      cycleSub: cycle.enabled || legacyCycle ? (cycle.mode === 'těhotenství' ? 'Těhotenství zapnuto' : 'Cyklus zapnutý') : 'Cyklus a těhotenství · vypnuto',
+      card: front && back ? 'ok' : front ? 'back' : 'none',
+    };
+  }, [person.id, isSelf, s.settings.cycleTracking]);
 
   const doExport = async () => {
     const ok = await confirm(
@@ -111,7 +123,7 @@ export default function Settings() {
         </ScrollView>
 
         <Group title={isSelf ? 'Můj profil' : 'Karta: ' + person.name} dot="#F7931E">
-          <Row title="Osobní údaje" sub={isSelf ? 'Jméno, pojišťovna, kontakt, tělo' : [REL[person.relation], person.birthDate ? ageLabel(ageOn(person.birthDate, today)) : null].filter(Boolean).join(' · ')} onPress={() => router.push('/nastaveni/osobni')} />
+          <Row title="Osobní údaje" sub={isSelf ? 'Údaje pro lékaře, tělo, životospráva' : [REL[person.relation], person.birthDate ? ageLabel(ageOn(person.birthDate, today)) : null].filter(Boolean).join(' · ')} onPress={() => router.push('/nastaveni/osobni')} />
           {!isSelf ? (
             <>
               <Divider />
@@ -119,13 +131,13 @@ export default function Settings() {
             </>
           ) : null}
           <Divider />
+          <Row title="Doplňující údaje a předvolby" sub={value?.cycleSub} onPress={() => router.push('/nastaveni/doplnujici')} />
+          <Divider />
           <Row
-            title="Cyklus"
-            sub="Menstruace, odhad, zápisy do osy"
-            onPress={() => {
-              router.back();
-              router.push('/cyklus');
-            }}
+            title="Doklady a průkaz pojištěnce"
+            sub={!value ? undefined : value.card === 'ok' ? 'Vše nahráno' : value.card === 'back' ? 'Chybí rub kartičky pojištěnce' : 'Vyfoťte kartičku pojištěnce'}
+            warn={!!value && value.card !== 'ok'}
+            onPress={() => router.push('/nastaveni/doklady')}
           />
         </Group>
 
