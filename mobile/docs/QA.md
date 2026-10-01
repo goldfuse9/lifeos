@@ -98,3 +98,14 @@ nesmí vidět nic ze starého.
 | Špatné heslo zálohy | „Heslo nesedí, nebo je soubor poškozený.“ |
 | Správné heslo | Krok „Rychlé odemykání“, pak všechny karty, záznamy, cyklus i fotky zpět |
 | Vybrat jiný soubor (PDF) | „Tohle není záloha LifeOS.“ |
+
+## I. Připomínky
+
+| Test | Očekávání |
+| --- | --- |
+| Kalendář → zítřek → Naplánovat → „Připomenout: Hodinu předem“ | Telefon se zeptá na povolení upozornění |
+| Já → Upozornění | „Naplánováno“ ukazuje připomínku |
+| Naplánovat termín za 70 min s „Hodinu předem“, zamknout telefon | Za ~10 min upozornění „Za hodinu (…) · naplánovaný termín“ |
+| Klepnout na upozornění | Otevře se termín (po odemknutí) |
+| Upozornění → Ukázat název termínu | V textu je název |
+| Smazat termín | Připomínka zmizí z „Naplánováno“ |

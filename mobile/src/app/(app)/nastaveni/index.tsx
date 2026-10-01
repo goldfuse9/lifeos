@@ -169,7 +169,7 @@ export default function Settings() {
         <Group title="Aplikace" dot="#7A7682">
           <Row title="Vzhled" sub={s.settings.background + ' · ' + s.settings.avatarStyle + ' tlačítko'} onPress={() => router.push('/nastaveni/vzhled')} />
           <Divider />
-          <Row title="Upozornění" sub="Termíny, léky, novinky od lékaře" disabledNote="Připravujeme" onPress={soon('Upozornění')} />
+          <Row title="Upozornění" sub={s.settings.remindersEnabled ? 'Připomínky termínů zapnuté' : 'Vypnuto'} onPress={() => router.push('/nastaveni/upozorneni')} />
         </Group>
 
         <SecondaryButton style={{ marginTop: 24 }} label="Odhlásit se" onPress={logout} />

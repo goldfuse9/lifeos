@@ -3,12 +3,14 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Switch, View } f
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useData, usePerson, useSession } from '@/state/session';
 import { EDITABLE_TYPES, RECORD_TYPES, isRecordType } from '@/domain/recordTypes';
-import { isValidLocalDate, toLocalDate, toLocalTime } from '@/domain/dates';
+import { combine, isValidLocalDate, toLocalDate, toLocalTime } from '@/domain/dates';
 import type { HcRecord, RecordMetadata, RecordType } from '@/domain/types';
 import type { PickedFile } from '@/services/attachments';
 import { Backdrop, Card, Chip, Field, H1, Loading, PrimaryButton, Segmented, T, TopBar, useScreenInsets, useToast } from '@/ui/kit';
 import { DateField, TimeField } from '@/ui/DateTimeField';
 import { isPending } from '@/domain/timeline';
+import { REMIND_KEYS, remindOf, type RemindKey } from '@/domain/reminders';
+import { notificationPermission } from '@/platform/notifications';
 import { chooseSource, confirm, pickFrom } from '@/ui/device';
 import { C } from '@/ui/theme';
 import { IconClip, IconClose } from '@/ui/icons';
@@ -39,7 +41,7 @@ export default function RecordEditor() {
   const params = useLocalSearchParams<{ id?: string; date?: string; type?: string }>();
   const data = useData();
   const person = usePerson();
-  const { touch } = useSession();
+  const { touch, settings, updateSettings } = useSession();
   const toast = useToast();
   const ins = useScreenInsets();
   const navigation = useNavigation();
@@ -62,6 +64,7 @@ export default function RecordEditor() {
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
   const [whenOpen, setWhenOpen] = useState(false);
+  const [remind, setRemind] = useState<RemindKey[]>(() => (settings.remindersEnabled ? (settings.remindDefault as RemindKey[]) : []));
   const [dirty, setDirty] = useState(false);
   // Posluchač „beforeRemove“ čte ref, ne stav — po uložení se musí odejít hned.
   const dirtyRef = useRef(false);
@@ -81,6 +84,7 @@ export default function RecordEditor() {
       setTime(r.time ?? '09:00');
       setPlace(r.metadata.place ?? '');
       setDescription(r.description);
+      setRemind(remindOf(r));
       setAssess(r.metadata.badge ? (r.metadata.badgeTone === 'warn' ? 'warn' : 'ok') : 'none');
     });
   }, [params.id, data]);
@@ -104,7 +108,21 @@ export default function RecordEditor() {
 
   const isEdit = !!params.id;
   const showWhen = isEdit || whenOpen || type === 'event' || initialDate !== toLocalDate(now);
+  const future = showWhen && combine(date, allDay ? null : time).getTime() > now.getTime();
   const isMood = type === 'mood';
+
+  const toggleRemind = async (k: RemindKey) => {
+    const on = remind.includes(k);
+    if (!on && !settings.remindersEnabled) {
+      if (!(await notificationPermission(true))) {
+        toast('Upozornění jsou v telefonu vypnutá — povolte je v Nastavení telefonu.');
+        return;
+      }
+      await updateSettings({ remindersEnabled: true });
+    }
+    setDirty(true);
+    setRemind((cur) => (on ? cur.filter((x) => x !== k) : [...cur, k]));
+  };
   const titleError = !title.trim() ? 'Vyplňte název.' : null;
 
   const typeChips = useMemo(() => (isMood ? [] : EDITABLE_TYPES), [isMood]);
@@ -135,6 +153,8 @@ export default function RecordEditor() {
         delete metadata.badge;
         delete metadata.badgeTone;
       }
+      if (future && remind.length) metadata.remind = remind;
+      else delete metadata.remind;
       const draft = { type, title, description, date, time: allDay ? null : time, metadata };
       const rec = isEdit && loaded ? await data.records.update(loaded.id, draft) : await data.records.create(person.id, draft);
       let failed = 0;
@@ -202,6 +222,16 @@ export default function RecordEditor() {
               <T style={{ fontSize: 13, color: C.muted, textDecorationLine: 'underline' }}>Jiný den nebo čas (naplánovat)</T>
             </Pressable>
           )}
+          {future ? (
+            <View style={{ gap: 6 }}>
+              <T w="semibold" style={{ fontSize: 13, color: C.muted }}>Připomenout</T>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                {REMIND_KEYS.map(([k, l]) => (
+                  <Chip key={k} label={l} selected={remind.includes(k)} onPress={() => toggleRemind(k)} />
+                ))}
+              </View>
+            </View>
+          ) : null}
           {WITH_PLACE.includes(type) ? <Field label="Kde / u koho" value={place} onChangeText={set(setPlace)} placeholder="Např. MUDr. Nováková, Poliklinika" maxLength={140} /> : null}
           {type === 'result' ? (
             <View style={{ gap: 6 }}>

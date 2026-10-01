@@ -8,6 +8,9 @@ import { openEncryptedDb, deleteDb } from '@/platform/sqlite';
 import { biometricInfo, newId, randomBytes, secureKeyStore, type BiometricInfo } from '@/platform/secure';
 import { backupFiles, sandboxFiles } from '@/platform/files';
 import { collectBackup, openBackup, restoreBackup, sealBackup } from '@/services/backup';
+import { remindOf, remindersFor } from '@/domain/reminders';
+import { addDays, toLocalDate } from '@/domain/dates';
+import { applyReminders, clearReminders, notificationPermission } from '@/platform/notifications';
 
 /**
  * Stav relace aplikace.
@@ -79,6 +82,23 @@ export async function withLockHold<T>(fn: () => Promise<T>): Promise<T> {
 
 const auth = new AuthService(secureKeyStore, randomBytes);
 const clock = { now: () => new Date() };
+
+/** Přepočítá naplánované připomínky z databáze. */
+async function syncReminders(d: HcData, st: AppSettings): Promise<void> {
+  if (!st.remindersEnabled) {
+    await clearReminders();
+    return;
+  }
+  if (!(await notificationPermission(false))) return;
+  const now = new Date();
+  const today = toLocalDate(now);
+  const items = [];
+  for (const p of await d.persons.list()) {
+    const recs = await d.records.query({ personId: p.id, from: addDays(today, -1), to: addDays(today, 62), order: 'asc' });
+    for (const r of recs) if (remindOf(r).length) items.push({ r, personName: p.name, isSelf: p.isSelf });
+  }
+  await applyReminders(remindersFor(items, now, st.remindShowTitle));
+}
 
 async function openData(dekHex: string): Promise<HcData> {
   const db = await openEncryptedDb(dekHex);
@@ -178,6 +198,15 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return () => sub.remove();
   }, [lock]);
 
+  // Připomínky: po každé změně dat nebo nastavení (s malým zpožděním).
+  useEffect(() => {
+    if (status !== 'unlocked' || !data) return;
+    const t = setTimeout(() => {
+      syncReminders(data, settings).catch(() => {});
+    }, 800);
+    return () => clearTimeout(t);
+  }, [status, data, version, settings]);
+
   const value = useMemo<SessionValue>(() => {
     const person = persons.find((p) => p.id === personId) ?? persons[0] ?? null;
     const self = persons.find((p) => p.isSelf) ?? null;
@@ -262,6 +291,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
       async wipeEverything() {
         await lock();
+        await clearReminders().catch(() => {});
         await auth.wipe();
         await deleteDb();
         try {

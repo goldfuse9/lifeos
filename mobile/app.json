@@ -59,6 +59,13 @@
           "cameraPermission": "LifeOS potřebuje fotoaparát, abyste mohli vyfotit lékařskou zprávu nebo recept.",
           "photosPermission": "LifeOS potřebuje přístup k fotkám, abyste mohli připojit snímek k záznamu."
         }
+      ],
+      "./plugins/withoutPushEntitlement",
+      [
+        "expo-notifications",
+        {
+          "enableBackgroundRemoteNotifications": false
+        }
       ]
     ],
     "experiments": {

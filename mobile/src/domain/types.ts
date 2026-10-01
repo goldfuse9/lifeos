@@ -181,6 +181,12 @@ export interface AppSettings {
   recentSearches: string[];
   /** Kdy vznikla poslední záloha (ISO), null = nikdy. */
   lastBackupAt: string | null;
+  /** Místní připomínky naplánovaných termínů. */
+  remindersEnabled: boolean;
+  /** Výchozí připomenutí u nového termínu ('1h' | '1d'). */
+  remindDefault: string[];
+  /** Ukázat název termínu v upozornění (vidí ho i zamčený telefon). */
+  remindShowTitle: boolean;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -192,6 +198,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   cycleTracking: false,
   recentSearches: [],
   lastBackupAt: null,
+  remindersEnabled: false,
+  remindDefault: ['1d'],
+  remindShowTitle: false,
 };
 
 export interface Account {
