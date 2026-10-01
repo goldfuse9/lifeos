@@ -61,8 +61,8 @@ npx expo run:android
 
 ## Registr lékařů (našeptávání)
 
-1. Stáhněte CSV „Místa poskytování zdravotních služeb“ z otevřených dat
-   NRPZS: https://nrpzs.uzis.cz/index.php?pg=home--otevrena-data
+1. Stáhněte CSV „Místa poskytování zdravotních služeb“ (ÚZIS, měsíčně):
+   https://datanzis.uzis.gov.cz/data/NR-01-NRPZS/NR-01-06/Otevrena-data-NR-01-06-nrpzs-mista-poskytovani-zdravotnich-sluzeb.csv
 2. `node scripts/import-lekari.mjs ~/Downloads/<soubor>.csv`
 3. Sestavte aplikaci znovu. Bez tohoto kroku zůstává jen ruční zadání.
 
