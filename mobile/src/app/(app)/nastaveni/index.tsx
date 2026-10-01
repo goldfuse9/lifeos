@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import Constants from 'expo-constants';
 import { useData, useSession, withLockHold } from '@/state/session';
-import { useLoad } from '@/state/useLoad';
+import { useLoad, useNow } from '@/state/useLoad';
 import { emergencyProgress } from '@/domain/emergency';
 import { ageLabel, ageOn, toLocalDate } from '@/domain/dates';
 import { buildExport } from '@/services/export';
@@ -30,7 +30,9 @@ export default function Settings() {
   const person = s.person!;
   const isSelf = !!s.self && s.self.id === person.id;
   const [exporting, setExporting] = useState(false);
-  const today = toLocalDate(new Date());
+  const nowDate = useNow();
+  const nowMs = nowDate.getTime();
+  const today = toLocalDate(nowDate);
 
   const { value } = useLoad(async () => {
     const [em, doctors, cycle, docs] = await Promise.all([
@@ -150,7 +152,14 @@ export default function Settings() {
         <Group title="Soukromí a bezpečí" dot="#3B6FE0">
           <Row title="Přihlášení a zabezpečení" sub={(s.settings.biometricEnabled ? (s.bio?.label ?? 'Biometrie') + ' zapnuto' : 'Heslo') + ' · zámek, změna hesla'} onPress={() => router.push('/nastaveni/zabezpeceni')} />
           <Divider />
-          <Row title={exporting ? 'Připravuji export…' : 'Vzít si svoje data'} sub="Stáhnout vše jako soubor" onPress={exporting ? undefined : doExport} />
+          <Row
+            title="Záloha"
+            sub={s.settings.lastBackupAt ? 'Naposledy ' + new Date(s.settings.lastBackupAt).toLocaleDateString('cs-CZ') : 'Zatím žádná · chrání data při ztrátě telefonu'}
+            warn={!s.settings.lastBackupAt || nowMs - new Date(s.settings.lastBackupAt).getTime() > 30 * 86400_000}
+            onPress={() => router.push('/nastaveni/zaloha')}
+          />
+          <Divider />
+          <Row title={exporting ? 'Připravuji export…' : 'Vzít si svoje data'} sub="Čitelný soubor JSON (bez šifrování)" onPress={exporting ? undefined : doExport} />
           <Divider />
           <Row title="Kdo vidí moje data" sub="Sdílení s rodinou a lékaři" disabledNote="Připravujeme" onPress={soon('Sdílení')} />
           <Divider />

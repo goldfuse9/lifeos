@@ -72,3 +72,33 @@ export function removeCacheFile(name: string): void {
     // nic
   }
 }
+
+/** Čtení a zápis souborů příloh pro zálohu. */
+export const backupFiles = {
+  async read(fileName: string): Promise<Uint8Array> {
+    return new File(dir(), safe(fileName)).bytes();
+  },
+  write(fileName: string, bytes: Uint8Array): void {
+    const f = new File(dir(), safe(fileName));
+    if (f.exists) f.delete();
+    f.create();
+    f.write(bytes);
+  },
+  exists(fileName: string): boolean {
+    return sandboxFiles.exists(fileName);
+  },
+};
+
+/** Dočasný binární soubor v cache (záloha ke sdílení). */
+export function cacheBytes(name: string, bytes: Uint8Array): string {
+  const f = new File(Paths.cache, name);
+  if (f.exists) f.delete();
+  f.create();
+  f.write(bytes);
+  return f.uri;
+}
+
+/** Načte vybraný soubor (např. zálohu z výběru dokumentů). */
+export async function readUri(uri: string): Promise<Uint8Array> {
+  return new File(uri).bytes();
+}

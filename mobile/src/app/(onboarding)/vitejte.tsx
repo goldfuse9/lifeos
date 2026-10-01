@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { useSession } from '@/state/session';
-import { Backdrop, Card, H1, Muted, PrimaryButton, T, useScreenInsets } from '@/ui/kit';
+import { Backdrop, Card, H1, Muted, PrimaryButton, SecondaryButton, T, useScreenInsets } from '@/ui/kit';
 import { Wordmark } from '@/ui/Wordmark';
 import { C } from '@/ui/theme';
 import { IconLock, IconShield, TypeGlyph } from '@/ui/icons';
@@ -36,8 +36,9 @@ export default function Welcome() {
         <View style={{ flex: 1 }} />
         <View style={{ marginTop: 28, gap: 12 }}>
           <PrimaryButton label="Vytvořit účet" onPress={() => router.push('/register')} />
+          <SecondaryButton label="Obnovit ze zálohy" onPress={() => router.push('/obnovit')} />
           <T style={{ textAlign: 'center', fontSize: 13, lineHeight: 18, color: C.muted }}>
-            Prototyp. Zatím se nic nesynchronizuje — smazáním aplikace data zmizí.
+            Prototyp. Nic se nesynchronizuje — data chrání záloha, kterou si vytvoříte v nastavení.
           </T>
         </View>
       </ScrollView>

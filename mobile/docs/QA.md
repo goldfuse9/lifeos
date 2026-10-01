@@ -87,3 +87,14 @@ nesmí vidět nic ze starého.
 | Zapsat (osa, cyklus) | Klávesnice se nevysune sama, až po klepnutí do pole; žádné pole „Den“ |
 | Osa → Zapsat → „Jiný den nebo čas“ | Objeví se datum a čas pro plánování |
 | Cyklus → Historie cyklů | Řádky jen ukazují, úprava je v „Upravit cyklus“ |
+
+## H. Záloha a obnova
+
+| Test | Očekávání |
+| --- | --- |
+| Já → Záloha → heslo → Vytvořit zálohu → Uložit do Souborů | Soubor `LifeOS-zaloha-<datum>.lifeos`, v Já „Naposledy …“ |
+| Špatné heslo | „Heslo nesedí.“, nic nevznikne |
+| Smazat vše (nebo přeinstalovat) → Obnovit ze zálohy → vybrat soubor | „Záloha z …“ |
+| Špatné heslo zálohy | „Heslo nesedí, nebo je soubor poškozený.“ |
+| Správné heslo | Krok „Rychlé odemykání“, pak všechny karty, záznamy, cyklus i fotky zpět |
+| Vybrat jiný soubor (PDF) | „Tohle není záloha LifeOS.“ |

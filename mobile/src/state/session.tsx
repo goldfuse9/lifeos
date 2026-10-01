@@ -6,7 +6,8 @@ import type { Account, AppSettings, Id, Person } from '@/domain/types';
 import { DEFAULT_SETTINGS } from '@/domain/types';
 import { openEncryptedDb, deleteDb } from '@/platform/sqlite';
 import { biometricInfo, newId, randomBytes, secureKeyStore, type BiometricInfo } from '@/platform/secure';
-import { sandboxFiles } from '@/platform/files';
+import { backupFiles, sandboxFiles } from '@/platform/files';
+import { collectBackup, openBackup, restoreBackup, sealBackup } from '@/services/backup';
 
 /**
  * Stav relace aplikace.
@@ -36,6 +37,10 @@ interface SessionValue {
   covered: boolean;
 
   register(input: { name: string; email: string; password: string }): Promise<void>;
+  /** Ověří heslo a vytvoří šifrovanou zálohu (bajty souboru .lifeos). */
+  createBackup(password: string): Promise<Uint8Array>;
+  /** Nový účet z cizí/staré zálohy — heslo je heslo ze zálohy. */
+  restoreFromBackup(bytes: Uint8Array, password: string): Promise<void>;
   finishOnboarding(enableBio: boolean): Promise<void>;
   loginPassword(email: string, password: string): Promise<void>;
   loginBiometric(): Promise<void>;
@@ -189,6 +194,42 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           // Bez databáze nemá účet smysl — vrátit do výchozího stavu.
           await auth.wipe();
           await deleteDb();
+          throw e;
+        }
+        pendingDek.current = dek;
+        setAccount(acc);
+        setStatus('onboarding');
+      },
+
+      async createBackup(password) {
+        const acc = await auth.account();
+        const d = dataRef.current;
+        if (!acc || !d) throw new Error('Aplikace je zamčená.');
+        await auth.login(acc.email, password);
+        const content = await collectBackup(d.db, backupFiles, { name: acc.name, email: acc.email }, new Date());
+        return sealBackup(content, password, randomBytes);
+      },
+
+      async restoreFromBackup(bytes, password) {
+        const c = await openBackup(bytes, password);
+        const dek = await auth.register({ name: c.account.name, email: c.account.email, password });
+        const acc = (await auth.account())!;
+        try {
+          const d = await openData(dek);
+          await restoreBackup(d.db, backupFiles, c);
+          // Biometrie se zapíná znovu na tomto telefonu (krok po obnově).
+          await d.settings.set({ biometricEnabled: false });
+          await loadAfterUnlock(d, acc);
+        } catch (e) {
+          await lock();
+          await auth.wipe();
+          await deleteDb();
+          try {
+            sandboxFiles.removeAll();
+          } catch {
+            // nic
+          }
+          setStatus('welcome');
           throw e;
         }
         pendingDek.current = dek;

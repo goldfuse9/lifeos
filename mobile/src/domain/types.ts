@@ -179,6 +179,8 @@ export interface AppSettings {
   cycleTracking: boolean;
   /** Posledních pět hledání na Přehledu */
   recentSearches: string[];
+  /** Kdy vznikla poslední záloha (ISO), null = nikdy. */
+  lastBackupAt: string | null;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -189,6 +191,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   avatarStyle: 'limetková',
   cycleTracking: false,
   recentSearches: [],
+  lastBackupAt: null,
 };
 
 export interface Account {
