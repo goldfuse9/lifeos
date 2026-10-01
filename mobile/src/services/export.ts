@@ -24,6 +24,7 @@ export async function buildExport(data: HcData, account: { name: string; email: 
       doctors: (await data.personData.get(p.id, 'doctors')).list ?? [],
       cycle: await data.personData.get(p.id, 'cycle'),
       docs: await data.personData.get(p.id, 'docs'),
+      meds: (await data.personData.get(p.id, 'meds')).list ?? [],
       records: records.map((r) => ({
         ...r,
         attachments: (files.get(r.id) ?? []).map((a) => ({ name: a.name, mimeType: a.mimeType, size: a.size, kind: a.kind, createdAt: a.createdAt })),

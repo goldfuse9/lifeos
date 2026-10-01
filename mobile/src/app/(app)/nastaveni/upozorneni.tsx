@@ -47,7 +47,7 @@ export default function Upozorneni() {
         <TopBar title="Upozornění" backLabel="Zpět do nastavení" />
 
         <Card style={{ marginTop: 18, overflow: 'hidden', borderRadius: 24 }}>
-          <ToggleRow title="Připomínat termíny" sub="Návštěvy, odběry, očkování…" value={st.remindersEnabled} onChange={toggle} disabled={busy} />
+          <ToggleRow title="Připomínky" sub="Termíny a léky" value={st.remindersEnabled} onChange={toggle} disabled={busy} />
           {st.remindersEnabled ? (
             <>
               <Divider />
@@ -60,7 +60,7 @@ export default function Upozorneni() {
                 </View>
               </View>
               <Divider />
-              <ToggleRow title="Ukázat název termínu" sub={st.remindShowTitle ? 'Např. „Zítra v 9:00 · Kontrola u praktika“' : 'Jen „Zítra v 9:00 · naplánovaný termín“'} value={st.remindShowTitle} onChange={(v) => s.updateSettings({ remindShowTitle: v })} />
+              <ToggleRow title="Ukázat název termínu a léku" sub={st.remindShowTitle ? 'Např. „Zítra v 9:00 · Kontrola u praktika“' : 'Jen „Zítra v 9:00 · naplánovaný termín“'} value={st.remindShowTitle} onChange={(v) => s.updateSettings({ remindShowTitle: v })} />
             </>
           ) : null}
         </Card>

@@ -109,3 +109,13 @@ nesmí vidět nic ze starého.
 | Klepnout na upozornění | Otevře se termín (po odemknutí) |
 | Upozornění → Ukázat název termínu | V textu je název |
 | Smazat termín | Připomínka zmizí z „Naplánováno“ |
+
+## J. Léky
+
+| Test | Očekávání |
+| --- | --- |
+| Přehled → Léky → Přidat lék: Euthyrox, 50 µg, Ráno 8:00 | V ose „Začátek: Euthyrox 50 µg“, na Nouzové kartě v Lécích |
+| Odškrtnout dávku | Přeškrtnuto, dlaždice „dnes vše vzato“; druhé klepnutí vrátí |
+| Upravit dávku na 75 µg | V ose „Změna: …“ |
+| Přestat brát | V ose „Konec: …“, lék v „Dříve“, zmizí z nouzové karty |
+| Připomínat zapnuto, čas za 2 min (Jiný čas) | Upozornění „… · čas na lék“; klepnutí otevře Léky |

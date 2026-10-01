@@ -4,6 +4,8 @@ import { router } from 'expo-router';
 import { useData, usePerson } from '@/state/session';
 import { useLoad } from '@/state/useLoad';
 import { EMERGENCY_FIELDS, emergencyProgress, extractPhone } from '@/domain/emergency';
+import { medsForEmergency } from '@/domain/meds';
+import type { EmergencyData } from '@/domain/types';
 import { Backdrop, BottomFade, Callout, Card, H1, Muted, Note, PrimaryButton, SecondaryButton, T, TopBar, useScreenInsets, useUi } from '@/ui/kit';
 import { MeFab } from '@/ui/fabs';
 import { C } from '@/ui/theme';
@@ -21,8 +23,13 @@ export default function Nouze() {
   const ins = useScreenInsets();
   const data = useData();
   const person = usePerson();
-  const { value: em } = useLoad(() => data.personData.get(person.id, 'emergency'), [person.id]);
-  const e = em ?? {};
+  const { value: em } = useLoad(async () => {
+    const [e, m] = await Promise.all([data.personData.get(person.id, 'emergency'), data.personData.get(person.id, 'meds')]);
+    // Léky ze seznamu Léky + to, co je ručně v nouzových údajích.
+    const meds = [medsForEmergency(m.list ?? []), e.meds].filter(Boolean).join('; ');
+    return { ...e, meds: meds || undefined };
+  }, [person.id]);
+  const e: EmergencyData = em ?? {};
   const { filled } = emergencyProgress(e);
   const rows = EMERGENCY_FIELDS.filter((f) => f.prio <= 2 || e[f.k]);
   const ice = extractPhone(e.ice);

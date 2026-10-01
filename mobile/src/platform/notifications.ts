@@ -30,8 +30,10 @@ export async function applyReminders(list: PlannedReminder[]): Promise<void> {
   for (const n of list) {
     await Notifications.scheduleNotificationAsync({
       identifier: n.id,
-      content: { title: n.title, body: n.body, data: { recordId: n.recordId }, sound: true },
-      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: n.at, channelId: CHANNEL },
+      content: { title: n.title, body: n.body, data: n.daily ? { screen: 'leky' } : { recordId: n.recordId }, sound: true },
+      trigger: n.daily
+        ? { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour: n.daily.hour, minute: n.daily.minute, channelId: CHANNEL }
+        : { type: Notifications.SchedulableTriggerInputTypes.DATE, date: n.at, channelId: CHANNEL },
     });
   }
 }
@@ -44,23 +46,30 @@ export async function scheduledReminders(): Promise<{ at: Date | null; body: str
   const all = await Notifications.getAllScheduledNotificationsAsync();
   return all
     .map((n) => {
-      const t = n.trigger as { type?: string; value?: number; date?: number | string } | null;
+      const t = n.trigger as { type?: string; value?: number; date?: number | string; hour?: number; minute?: number } | null;
       const raw = t && (t.value ?? t.date);
+      if (raw == null && t?.hour != null) {
+        // Denní (léky) — nejbližší výskyt.
+        const d = new Date();
+        d.setHours(t.hour, t.minute ?? 0, 0, 0);
+        if (d.getTime() < Date.now()) d.setDate(d.getDate() + 1);
+        return { at: d, body: n.content.body ?? '' };
+      }
       return { at: raw != null ? new Date(raw) : null, body: n.content.body ?? '' };
     })
     .sort((a, b) => (a.at?.getTime() ?? 0) - (b.at?.getTime() ?? 0));
 }
 
 /** Klepnutí na připomínku — otevřít záznam (jednou za každé upozornění). */
-export function useReminderTap(open: (recordId: string) => void): void {
+export function useReminderTap(open: (d: { recordId?: string; screen?: string }) => void): void {
   const resp = Notifications.useLastNotificationResponse();
   const handled = useRef<string | null>(null);
   useEffect(() => {
     if (!resp) return;
     const key = resp.notification.request.identifier + ':' + resp.notification.date;
-    const id = resp.notification.request.content.data?.recordId;
-    if (handled.current === key || typeof id !== 'string') return;
+    const d = (resp.notification.request.content.data ?? {}) as { recordId?: unknown; screen?: unknown };
+    if (handled.current === key) return;
     handled.current = key;
-    open(id);
+    open({ recordId: typeof d.recordId === 'string' ? d.recordId : undefined, screen: typeof d.screen === 'string' ? d.screen : undefined });
   }, [resp, open]);
 }

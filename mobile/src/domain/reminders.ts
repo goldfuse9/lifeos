@@ -1,4 +1,5 @@
 import type { HcRecord } from './types';
+import { medTitle, type Med } from './meds';
 import { combine, numericDate, toLocalDate } from './dates';
 
 /**
@@ -24,6 +25,8 @@ export interface PlannedReminder {
   at: Date;
   title: string;
   body: string;
+  /** Denní opakování (léky) — `at` je pak jen nejbližší výskyt. */
+  daily?: { hour: number; minute: number };
 }
 
 export function remindOf(r: HcRecord): RemindKey[] {
@@ -79,4 +82,35 @@ export function remindersFor(
   }
   out.sort((a, b) => a.at.getTime() - b.at.getTime());
   return out.slice(0, MAX_SCHEDULED);
+}
+
+/**
+ * Denní připomínky léků. Léky stejné karty ve stejný čas jsou v jednom
+ * upozornění. Text bez názvů léků, dokud to člověk nezapne.
+ */
+export function medRemindersFor(items: { meds: Med[]; personId: string; personName: string; isSelf: boolean }[], now: Date, showTitle: boolean): PlannedReminder[] {
+  const out: PlannedReminder[] = [];
+  for (const { meds, personId, personName, isSelf } of items) {
+    const byTime = new Map<string, Med[]>();
+    for (const m of meds) {
+      if (!m.active || !m.remind) continue;
+      for (const t of m.times) byTime.set(t, [...(byTime.get(t) ?? []), m]);
+    }
+    for (const [t, list] of byTime) {
+      const [hour, minute] = t.split(':').map(Number);
+      const at = new Date(now);
+      at.setHours(hour, minute, 0, 0);
+      if (at.getTime() <= now.getTime()) at.setDate(at.getDate() + 1);
+      const what = showTitle ? list.map(medTitle).join(', ') : list.length === 1 ? 'čas na lék' : `čas na léky (${list.length})`;
+      out.push({
+        id: `med:${personId}:${t}`,
+        recordId: '',
+        at,
+        daily: { hour, minute },
+        title: !isSelf ? `Připomínka · ${personName}` : 'Připomínka',
+        body: `${hhmm(t)} · ${what}`,
+      });
+    }
+  }
+  return out.sort((a, b) => a.at.getTime() - b.at.getTime());
 }

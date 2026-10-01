@@ -80,7 +80,7 @@ export default function Nouzove() {
                       </View>
                     </View>
                   ) : (
-                    <Field key={f.k} label={f.label} value={e[f.k] ?? ''} onChangeText={(v) => set(f.k, v)} placeholder={f.ph} multiline={f.prio === 1} maxLength={600} />
+                    <Field key={f.k} label={f.label} value={e[f.k] ?? ''} onChangeText={(v) => set(f.k, v)} placeholder={f.k === 'meds' ? 'Jen co není v seznamu Léky' : f.ph} hint={f.k === 'meds' ? 'Léky ze seznamu Léky se na kartu doplní samy.' : undefined} multiline={f.prio === 1} maxLength={600} />
                   ),
                 )}
               </Card>

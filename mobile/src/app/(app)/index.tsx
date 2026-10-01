@@ -5,6 +5,7 @@ import { useData, usePerson, useSession } from '@/state/session';
 import { useLoad, useNow } from '@/state/useLoad';
 import { RECORD_TYPES } from '@/domain/recordTypes';
 import { isPending, isUpcoming, recordSubtitle } from '@/domain/timeline';
+import { dosesFor } from '@/domain/meds';
 import { MONTHS_SHORT, WEEKDAYS_SHORT, addDays, longDate, parseLocalDate, plural, relativeDays, startOfWeek, toLocalDate, toLocalTime, vocative } from '@/domain/dates';
 import { Backdrop, BottomFade, Card, DateBadge, Muted, PillButton, T, Tile, useScreenInsets, useUi } from '@/ui/kit';
 import { FabMenu } from '@/ui/fabs';
@@ -40,17 +41,23 @@ export default function Prehled() {
 
   const weekStart = startOfWeek(today);
   const { value } = useLoad(async () => {
-    const [future, past, docs, week] = await Promise.all([
+    const [future, past, docs, week, meds, medlog] = await Promise.all([
       data.records.query({ personId: person.id, from: today, order: 'asc', limit: 30 }),
       data.records.query({ personId: person.id, to: today, order: 'desc', limit: 40 }),
       data.attachments.forPerson(person.id),
       data.records.datesWithRecords(person.id, weekStart, addDays(weekStart, 6)),
+      data.personData.get(person.id, 'meds'),
+      data.personData.get(person.id, 'medlog'),
     ]);
+    const doses = dosesFor(meds.list ?? [], medlog, today);
     return {
       upcoming: future.filter((r) => isUpcoming(r, today, nowTime)).slice(0, 8),
       recent: past.filter((r) => !isUpcoming(r, today, nowTime) && !isPending(r, new Date())).slice(0, 6),
       docs: docs.length,
       week,
+      medsCount: (meds.list ?? []).filter((m) => m.active).length,
+      medsLeft: doses.length ? doses.filter((d) => !d.taken).length : null,
+      medsTotal: doses.length,
     };
   }, [person.id, today, nowTime, weekStart]);
 
@@ -107,6 +114,7 @@ export default function Prehled() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} snapToInterval={207} decelerationRate="fast" style={{ marginTop: 12, marginHorizontal: -16 }} contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 4, gap: 10 }}>
           <TileTimeline onPress={() => router.push('/osa')} />
           {showCycle ? <TileCycle info={cycle.settings.enabled && cycle.settings.mode !== 'těhotenství' ? cycle.info : null} pregnant={cycle.settings.enabled && cycle.settings.mode === 'těhotenství'} onPress={() => router.push('/cyklus')} /> : null}
+          <TileMeds left={value?.medsLeft ?? null} total={value?.medsTotal ?? 0} count={value?.medsCount ?? 0} onPress={() => router.push('/leky')} />
           <TileDoctors onPress={() => router.push('/lekari')} />
           <TileDocs count={value?.docs ?? 0} onPress={() => router.push('/dokumenty')} />
         </ScrollView>
@@ -274,6 +282,30 @@ function TileTimeline({ onPress }: { onPress: () => void }) {
       <View style={{ position: 'absolute', left: 25, top: 138, width: 119, height: 26, paddingHorizontal: 9, borderRadius: 13, backgroundColor: '#FAFAF9', boxShadow: '0px 6px 16px rgba(40,40,40,0.06)', transform: [{ rotate: '-2deg' }], flexDirection: 'row', alignItems: 'center', gap: 7 }}>
         <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: C.orange }} />
         {bar(48)}
+      </View>
+    </TileShell>
+  );
+}
+
+function TileMeds({ count, total, left, onPress }: { count: number; total: number; left: number | null; onPress: () => void }) {
+  const sub = !count ? 'Přidat lék' : left == null ? `${count} ${plural(count, 'lék', 'léky', 'léků')}` : left ? `dnes zbývá ${left}` : 'dnes vše vzato';
+  return (
+    <TileShell title="Léky" label={'Léky, ' + sub} onPress={onPress}>
+      <View style={{ position: 'absolute', left: 0, right: 0, top: 70, alignItems: 'center' }}>
+        <View style={{ width: 92, height: 40, borderRadius: 20, overflow: 'hidden', flexDirection: 'row', transform: [{ rotate: '-28deg' }], boxShadow: '0px 10px 24px rgba(217,146,15,0.25)' }}>
+          <View style={{ flex: 1, backgroundColor: '#F2B544' }} />
+          <View style={{ flex: 1, backgroundColor: '#FDF3DF' }} />
+        </View>
+        {left != null ? (
+          <View style={{ marginTop: 14, flexDirection: 'row', gap: 5 }}>
+            {Array.from({ length: Math.min(6, total) }, (_, i) => (
+              <View key={i} style={{ width: 9, height: 9, borderRadius: 5, backgroundColor: i < total - (left ?? 0) ? '#D9920F' : '#E6E5E2' }} />
+            ))}
+          </View>
+        ) : null}
+      </View>
+      <View style={{ position: 'absolute', left: 8, right: 8, bottom: 8, height: 40, paddingHorizontal: 12, borderRadius: 18, backgroundColor: C.white, justifyContent: 'center' }}>
+        <T w="semibold" numberOfLines={1} style={{ fontSize: 12, lineHeight: 16, color: C.ink2 }}>{sub}</T>
       </View>
     </TileShell>
   );
