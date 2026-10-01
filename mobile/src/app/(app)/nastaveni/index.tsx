@@ -46,11 +46,11 @@ export default function Settings() {
     );
     if (!ok) return;
     setExporting(true);
-    const name = `humancare-export-${today}.json`;
+    const name = `lifeos-export-${today}.json`;
     try {
       const json = await buildExport(data, s.account);
       const uri = cacheFile(name, json);
-      if (await Sharing.isAvailableAsync()) await withLockHold(() => Sharing.shareAsync(uri, { mimeType: 'application/json', dialogTitle: 'Export HumanCare', UTI: 'public.json' }));
+      if (await Sharing.isAvailableAsync()) await withLockHold(() => Sharing.shareAsync(uri, { mimeType: 'application/json', dialogTitle: 'Export LifeOS', UTI: 'public.json' }));
       else toast('Sdílení není v tomto telefonu dostupné.');
     } catch {
       toast('Export se nepovedl.');
@@ -150,7 +150,7 @@ export default function Settings() {
 
         <SecondaryButton style={{ marginTop: 24 }} label="Odhlásit se" onPress={logout} />
         <Muted style={{ marginTop: 12, textAlign: 'center', fontSize: 12 }}>
-          HumanCare {Constants.expoConfig?.version ?? ''} · prototyp · data jen v tomto telefonu
+          LifeOS {Constants.expoConfig?.version ?? ''} · prototyp · data jen v tomto telefonu
         </Muted>
       </ScrollView>
     </View>

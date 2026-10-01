@@ -213,7 +213,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       },
 
       async loginBiometric() {
-        const dek = await auth.unlockWithBiometric('Odemknout HumanCare');
+        const dek = await auth.unlockWithBiometric('Odemknout LifeOS');
         await unlockWith(dek);
       },
 

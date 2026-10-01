@@ -20,7 +20,7 @@ async function pickFromInner(source: Source): Promise<PickedFile[]> {
   if (source === 'camera') {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert('Fotoaparát není povolený', 'Povolte HumanCare přístup k fotoaparátu v nastavení telefonu.');
+      Alert.alert('Fotoaparát není povolený', 'Povolte LifeOS přístup k fotoaparátu v nastavení telefonu.');
       return [];
     }
     const r = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.8, exif: false });

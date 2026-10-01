@@ -68,8 +68,8 @@ function PrivacyCover() {
     <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
       <Backdrop />
       <T style={{ fontSize: 20, letterSpacing: -0.6, color: C.ink }}>
-        <T w="semibold" style={{ fontSize: 20 }}>Human</T>
-        <T style={{ fontSize: 20, color: C.muted }}>Care</T>
+        <T w="semibold" style={{ fontSize: 20 }}>Life</T>
+        <T style={{ fontSize: 20, color: C.muted }}>OS</T>
       </T>
     </View>
   );

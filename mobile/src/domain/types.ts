@@ -164,6 +164,8 @@ export interface AppSettings {
   avatarStyle: 'limetková' | 'černá';
   /** Jestli se v zápisu nabízí sekce Cyklus */
   cycleTracking: boolean;
+  /** Posledních pět hledání na Přehledu */
+  recentSearches: string[];
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -173,6 +175,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   background: 'čiré sklo',
   avatarStyle: 'limetková',
   cycleTracking: false,
+  recentSearches: [],
 };
 
 export interface Account {

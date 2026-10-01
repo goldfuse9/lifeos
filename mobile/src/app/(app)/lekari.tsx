@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, View } from 'react-native';
 import { useData, usePerson, useSession } from '@/state/session';
 import { useLoad } from '@/state/useLoad';
 import type { Doctor, DoctorRole } from '@/domain/types';
 import { newId } from '@/platform/secure';
+import { registryAvailable, suggestDoctors } from '@/data/doctorRegistry';
+import type { DoctorSuggestion } from '@/domain/doctorRegistry';
 import { Backdrop, Card, Divider, Field, H1, Muted, Note, PrimaryButton, SecondaryButton, Segmented, T, TopBar, useScreenInsets, useToast } from '@/ui/kit';
 import { confirm } from '@/ui/device';
 import { C } from '@/ui/theme';
 import { IconPhone, IconTrash } from '@/ui/icons';
 
 /**
- * Moji lékaři. Na plátně se lékař vyhledával v registru — registr je
- * online služba (fáze 2). Tady se lékař zadává ručně a jde mu rovnou
- * zavolat.
+ * Moji lékaři. Při psaní jména aplikace našeptává lékaře z Národního
+ * registru poskytovatelů zdravotních služeb (otevřená data, přibalená
+ * v aplikaci — funguje offline). Kdo v registru není, zadá se ručně.
  */
 
 const ROLES: [DoctorRole, string][] = [
@@ -34,6 +36,18 @@ export default function Lekari() {
   const list = value?.list ?? [];
   const [editing, setEditing] = useState<Doctor | null>(null);
   const [tried, setTried] = useState(false);
+  const [picked, setPicked] = useState(false);
+  const hasRegistry = useMemo(() => registryAvailable(), []);
+  const suggestions = useMemo(
+    () => (editing && hasRegistry && !picked && editing.name.trim().length >= 2 ? suggestDoctors(editing.name) : []),
+    [editing, hasRegistry, picked],
+  );
+
+  const pick = (s: DoctorSuggestion) => {
+    if (!editing) return;
+    setPicked(true);
+    setEditing({ ...editing, name: s.name, role: s.role, specialty: s.specialty || undefined, phone: s.phone || editing.phone, place: s.place || editing.place });
+  };
 
   const save = async (d: Doctor) => {
     setTried(true);
@@ -69,7 +83,7 @@ export default function Lekari() {
               <View key={d.id}>
                 {i ? <Divider /> : null}
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 14, paddingRight: 8, minHeight: 68, gap: 10 }}>
-                  <Pressable accessibilityRole="button" accessibilityLabel={'Upravit ' + d.name} onPress={() => setEditing(d)} style={{ flex: 1, paddingVertical: 10 }}>
+                  <Pressable accessibilityRole="button" accessibilityLabel={'Upravit ' + d.name} onPress={() => { setPicked(true); setEditing(d); }} style={{ flex: 1, paddingVertical: 10 }}>
                     <T w="semibold" style={{ fontSize: 15, lineHeight: 20 }}>{d.name}</T>
                     <T numberOfLines={2} style={{ fontSize: 13, lineHeight: 18, color: C.muted }}>{[ROLE_LONG[d.role], d.specialty, d.place].filter(Boolean).join(' · ')}</T>
                   </Pressable>
@@ -87,7 +101,31 @@ export default function Lekari() {
         {editing ? (
           <Card style={{ marginTop: 16, padding: 16, gap: 14 }}>
             <T w="semibold" style={{ fontSize: 16 }}>{list.some((x) => x.id === editing.id) ? 'Upravit lékaře' : 'Nový lékař'}</T>
-            <Field label="Jméno" value={editing.name} onChangeText={(v) => setEditing({ ...editing, name: v })} placeholder="MUDr. Jana Nováková" autoFocus error={tried && !editing.name.trim() ? 'Vyplňte jméno.' : null} />
+            <Field
+              label="Jméno"
+              value={editing.name}
+              onChangeText={(v) => {
+                setPicked(false);
+                setEditing({ ...editing, name: v });
+              }}
+              placeholder={hasRegistry ? 'Začněte psát příjmení nebo obor a město' : 'MUDr. Jana Nováková'}
+              autoFocus
+              autoCorrect={false}
+              error={tried && !editing.name.trim() ? 'Vyplňte jméno.' : null}
+            />
+            {suggestions.length ? (
+              <View accessibilityRole="list" style={{ marginTop: -6, borderRadius: 16, borderWidth: 1, borderColor: C.line, backgroundColor: C.white, overflow: 'hidden' }}>
+                {suggestions.map((s, i) => (
+                  <Pressable key={s.name + s.place + i} accessibilityRole="button" onPress={() => pick(s)} style={({ pressed }) => ({ paddingVertical: 10, paddingHorizontal: 14, borderTopWidth: i ? 1 : 0, borderTopColor: C.line, backgroundColor: pressed ? '#F4F4F3' : 'transparent' })}>
+                    <T w="semibold" numberOfLines={1} style={{ fontSize: 15, lineHeight: 20 }}>{s.name}</T>
+                    <T numberOfLines={2} style={{ fontSize: 13, lineHeight: 18, color: C.muted }}>{[ROLE_LONG[s.role] === 'Specialista' ? s.specialty : ROLE_LONG[s.role], s.place].filter(Boolean).join(' · ')}</T>
+                  </Pressable>
+                ))}
+              </View>
+            ) : null}
+            {hasRegistry && !picked && editing.name.trim().length >= 3 && !suggestions.length ? (
+              <T style={{ marginTop: -6, fontSize: 13, color: C.muted }}>V registru nenalezeno — doplňte údaje ručně.</T>
+            ) : null}
             <View style={{ gap: 6 }}>
               <T w="semibold" style={{ fontSize: 13, color: C.muted }}>Role</T>
               <Segmented label="Role lékaře" options={ROLES} value={editing.role} onChange={(r) => setEditing({ ...editing, role: r })} />
@@ -104,10 +142,14 @@ export default function Lekari() {
             ) : null}
           </Card>
         ) : (
-          <PrimaryButton style={{ marginTop: 16 }} label="Přidat lékaře" onPress={() => setEditing({ id: newId(), name: '', role: 'praktik' })} />
+          <PrimaryButton style={{ marginTop: 16 }} label="Přidat lékaře" onPress={() => { setPicked(false); setEditing({ id: newId(), name: '', role: 'praktik' }); }} />
         )}
 
-        <Note style={{ marginTop: 20 }}>Vyhledávání v registru lékařů a sdílení karty s lékařem přijde s online verzí.</Note>
+        <Note style={{ marginTop: 20 }}>
+          {hasRegistry
+            ? 'Návrhy pocházejí z Národního registru poskytovatelů zdravotních služeb (ÚZIS). Sdílení karty s lékařem přijde s online verzí.'
+            : 'Registr lékařů zatím není v aplikaci nahraný — lékaře zadejte ručně. Sdílení karty s lékařem přijde s online verzí.'}
+        </Note>
       </ScrollView>
     </KeyboardAvoidingView>
   );

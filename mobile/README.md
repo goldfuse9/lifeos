@@ -1,4 +1,4 @@
-# HumanCare — mobilní aplikace (fáze 1)
+# LifeOS — mobilní aplikace (fáze 1)
 
 Funkční prototyp pro iOS a Android. Expo SDK 57 / React Native 0.86, TypeScript.
 Data jsou jen v telefonu, zašifrovaná, aplikace funguje bez internetu.
@@ -22,9 +22,10 @@ barvy, písmo, rozměry, ikony i texty jsou převzaté odtamtud.
 | Kalendář | ✅ měsíc, tečky, den, naplánovat / zapsat — stejná data jako osa |
 | Karty rodiny | ✅ přidat, upravit, odebrat, přepínat |
 | Osobní a nouzové údaje, lékaři | ✅ ukládají se, nouzová karta je zobrazuje, lékaři jdou volat |
+| Našeptávání lékařů z registru NRPZS | ✅ offline, po nahrání dat skriptem `scripts/import-lekari.mjs` (viz níže) |
 | Vzhled | ✅ 4 pozadí a barva tlačítka „já“ z plátna |
 | Export dat | ✅ JSON přes systémové sdílení |
-| Notifikace, zprávy, sdílení, „Kdo se mi díval“, kód pro záchranáře, registr lékařů | ⏳ označeno „Připravujeme“ — potřebují server (fáze 2) |
+| Notifikace, zprávy, sdílení, „Kdo se mi díval“, kód pro záchranáře | ⏳ označeno „Připravujeme“ — potřebují server (fáze 2) |
 
 ## Spuštění
 
@@ -58,12 +59,19 @@ npx expo run:android
   nutné předem zaregistrovat přes `eas device:create`) nebo TestFlight přes
   `--profile production` + `eas submit`.
 
+## Registr lékařů (našeptávání)
+
+1. Stáhněte CSV „Místa poskytování zdravotních služeb“ z otevřených dat
+   NRPZS: https://nrpzs.uzis.cz/index.php?pg=home--otevrena-data
+2. `node scripts/import-lekari.mjs ~/Downloads/<soubor>.csv`
+3. Sestavte aplikaci znovu. Bez tohoto kroku zůstává jen ruční zadání.
+
 ## Kontroly
 
 ```bash
 npm run typecheck   # TypeScript
 npx eslint src      # lint (pravidla React Compileru)
-npm test            # doména, datová vrstva, přihlášení — 22 testů v Node
+npm test            # doména, datová vrstva, přihlášení — 24 testů v Node
 ```
 
 Ruční test na telefonu: [docs/QA.md](docs/QA.md).

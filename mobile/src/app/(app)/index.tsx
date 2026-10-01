@@ -7,7 +7,8 @@ import { RECORD_TYPES } from '@/domain/recordTypes';
 import { isUpcoming, recordSubtitle } from '@/domain/timeline';
 import { MONTHS_SHORT, WEEKDAYS_SHORT, addDays, longDate, parseLocalDate, plural, relativeDays, startOfWeek, toLocalDate, toLocalTime, vocative } from '@/domain/dates';
 import { Backdrop, BottomFade, Card, DateBadge, Muted, PillButton, T, Tile, useScreenInsets, useUi } from '@/ui/kit';
-import { MeFab, MoodFab, SearchFab } from '@/ui/fabs';
+import { MeFab, MoodFab } from '@/ui/fabs';
+import { PrehledSearch } from '@/ui/PrehledSearch';
 import { Wordmark } from '@/ui/Wordmark';
 import { C } from '@/ui/theme';
 import { IconCalendar, IconClose, IconPlus } from '@/ui/icons';
@@ -29,6 +30,7 @@ export default function Prehled() {
   const nowTime = toLocalTime(now);
   const [openUp, setOpenUp] = useState(false);
   const [openRec, setOpenRec] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const weekStart = startOfWeek(today);
   const { value } = useLoad(async () => {
@@ -220,9 +222,9 @@ export default function Prehled() {
       </ScrollView>
 
       <BottomFade />
-      <MoodFab onPress={() => router.push('/zapis')} />
-      <SearchFab onPress={() => router.push('/hledat')} label="Hledat v kartě" />
-      <MeFab onPress={() => router.push('/nastaveni')} />
+      {!searchOpen ? <MoodFab onPress={() => router.push('/zapis')} /> : null}
+      {!searchOpen ? <MeFab onPress={() => router.push('/nastaveni')} /> : null}
+      <PrehledSearch open={searchOpen} onOpen={() => setSearchOpen(true)} onClose={() => setSearchOpen(false)} />
     </View>
   );
 }
