@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSession } from '@/state/session';
 import { C, ME_STYLES, initials } from './theme';
 import { PillButton, RadialFill, T, haptic } from './kit';
-import { IconMoodFab, IconPlus, IconScan, IconSearch } from './icons';
+import { IconFilter, IconMoodFab, IconPlus, IconScan, IconSearch } from './icons';
 
 /**
  * Plovoucí tlačítka u spodního okraje.
@@ -73,25 +73,50 @@ export function MoodFab({ onPress }: { onPress: () => void }) {
   );
 }
 
-/** Černé tlačítko vpravo dole („+ Zapsat“, „+ Nahrát“) — akce podle stránky. */
-export function ActionFab({ label, onPress, icon, a11y }: { label: string; onPress: () => void; icon?: React.ReactNode; a11y?: string }) {
+/** Černé tlačítko vpravo dole („+ Zapsat“, „+ Nahrát“) — akce podle stránky. `before` = kulaté tlačítko vlevo od něj. */
+export function ActionFab({ label, onPress, icon, a11y, before }: { label: string; onPress: () => void; icon?: React.ReactNode; a11y?: string; before?: React.ReactNode }) {
   const insets = useSafeAreaInsets();
+  return (
+    <View pointerEvents="box-none" style={{ position: 'absolute', bottom: 32 + Math.max(0, insets.bottom - 16), right: 16, zIndex: 19, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+      {before}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={a11y ?? label}
+        onPress={() => {
+          haptic();
+          onPress();
+        }}
+        style={({ pressed }) => ({
+          height: 56, paddingLeft: 16, paddingRight: 22, borderRadius: 28, backgroundColor: C.ink, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+          boxShadow: '0px 12px 32px rgba(0,0,0,0.24)', flexDirection: 'row', alignItems: 'center', gap: 8, transform: [{ scale: pressed ? 0.97 : 1 }],
+        })}
+      >
+        {icon ?? <IconPlus color={C.white} />}
+        <T w="semibold" style={{ fontSize: 15, color: C.white }}>{label}</T>
+      </Pressable>
+    </View>
+  );
+}
+
+const VIOLET = ['#9B3FE0', '#B46FEA', '#D9B8F5'] as const;
+
+/** Fialové kulaté tlačítko filtru (vedle „Zapsat“ na Ose). */
+export function FilterFab({ onPress, active, label = 'Filtr' }: { onPress: () => void; active?: boolean; label?: string }) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={a11y ?? label}
+      accessibilityLabel={label}
+      accessibilityState={{ selected: !!active }}
       onPress={() => {
         haptic();
         onPress();
       }}
-      style={({ pressed }) => ({
-        position: 'absolute', bottom: 32 + Math.max(0, insets.bottom - 16), right: 16, zIndex: 19, height: 56,
-        paddingLeft: 16, paddingRight: 22, borderRadius: 28, backgroundColor: C.ink, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
-        boxShadow: '0px 12px 32px rgba(0,0,0,0.24)', flexDirection: 'row', alignItems: 'center', gap: 8, transform: [{ scale: pressed ? 0.97 : 1 }],
-      })}
+      style={({ pressed }) => ({ width: 56, height: 56, borderRadius: 28, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', boxShadow: '0px 12px 32px rgba(155,63,224,0.40)', alignItems: 'center', justifyContent: 'center', transform: [{ scale: pressed ? 0.95 : 1 }] })}
     >
-      {icon ?? <IconPlus color={C.white} />}
-      <T w="semibold" style={{ fontSize: 15, color: C.white }}>{label}</T>
+      <RadialFill stops={VIOLET} radius={28} />
+      <View pointerEvents="none" style={{ position: 'absolute', top: 7, left: 7, right: 7, bottom: 7, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.65)' }} />
+      <IconFilter color={C.white} />
+      {active ? <View style={{ position: 'absolute', top: 9, right: 9, width: 10, height: 10, borderRadius: 5, backgroundColor: C.lime, borderWidth: 2, borderColor: '#9B3FE0' }} /> : null}
     </Pressable>
   );
 }
