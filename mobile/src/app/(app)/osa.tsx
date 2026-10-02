@@ -10,7 +10,7 @@ import { addMonthsLocal, numericDate, plural, toLocalDate, toLocalTime } from '@
 import { DateField } from '@/ui/DateTimeField';
 import type { Attachment, HcRecord, RecordType } from '@/domain/types';
 import { Backdrop, BottomFade, Chip, H1, Muted, SecondaryButton, T, TopBar, useScreenInsets, useUi } from '@/ui/kit';
-import { ActionFab, FilterFab, SearchPill } from '@/ui/fabs';
+import { ActionFab, FilterFab } from '@/ui/fabs';
 import { RecordCard } from '@/ui/records';
 import { C, F } from '@/ui/theme';
 import { IconClose, IconFilter, IconSearch } from '@/ui/icons';
@@ -54,8 +54,6 @@ export default function Osa() {
   const [to, setTo] = useState(() => toLocalDate(new Date()));
   const [searchOpen, setSearchOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
-  // Z lupy se rovnou píše; z filtru se klávesnice nevysouvá.
-  const [searchFocus, setSearchFocus] = useState(true);
   const [active, setActive] = useState(0);
   const listRef = useRef<SectionList<Item, Section>>(null);
 
@@ -219,16 +217,7 @@ export default function Osa() {
         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: ins.top + 190 }}
       />
       <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0, paddingTop: ins.top, paddingHorizontal: 16 }}>
-        <TopBar title={person.name} backLabel="Zpět na přehled" extra={
-            <SearchPill
-              label="Hledat"
-              active={!!query.trim()}
-              onPress={() => {
-                setSearchFocus(true);
-                setSearchOpen(true);
-              }}
-            />
-          } />
+        <TopBar title={person.name} backLabel="Zpět na přehled" />
         <View pointerEvents="none" style={{ marginTop: 18, paddingLeft: 8 }}>
           <H1>{filtering ? (query.trim() || period === 'all' ? 'Hledání' : PERIOD_TITLE[period]) : head?.title ?? 'Dnes'}</H1>
           <Muted style={{ marginTop: 4 }}>
@@ -286,7 +275,6 @@ export default function Osa() {
                 <IconSearch size={16} color={C.muted} width={1.6} />
                 <TextInput
                   keyboardAppearance="light"
-                  autoFocus={searchFocus}
                   accessibilityLabel="Hledat v záznamech"
                   value={query}
                   onChangeText={(s) => {
@@ -326,10 +314,9 @@ export default function Osa() {
             onPress={() => router.push({ pathname: '/zaznam/upravit', params: { date: today } })}
             before={
               <FilterFab
-                label="Filtr a období"
-                active={filterCount > 0}
+                label="Hledat a filtrovat"
+                active={filterCount > 0 || !!query.trim()}
                 onPress={() => {
-                  setSearchFocus(false);
                   setFilterOpen(true);
                   setSearchOpen(true);
                 }}
