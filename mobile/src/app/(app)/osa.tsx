@@ -5,8 +5,9 @@ import { router } from 'expo-router';
 import { useData, usePerson } from '@/state/session';
 import { useLoad, useNow } from '@/state/useLoad';
 import { RECORD_TYPES, RECORD_TYPE_ORDER } from '@/domain/recordTypes';
-import { daySummary, ensureToday, groupByDay, isPending, nowLineIndex, type TimelineDay } from '@/domain/timeline';
-import { plural, toLocalDate, toLocalTime } from '@/domain/dates';
+import { PROBLEM_TYPES, daySummary, ensureToday, groupByDay, isPending, nowLineIndex, problemSummary, type TimelineDay } from '@/domain/timeline';
+import { addMonthsLocal, numericDate, plural, toLocalDate, toLocalTime } from '@/domain/dates';
+import { DateField } from '@/ui/DateTimeField';
 import type { Attachment, HcRecord, RecordType } from '@/domain/types';
 import { Backdrop, BottomFade, Chip, H1, Muted, SecondaryButton, T, TopBar, useScreenInsets, useUi } from '@/ui/kit';
 import { ActionFab, SearchPill } from '@/ui/fabs';
@@ -20,6 +21,15 @@ import { IconClose, IconFilter, IconSearch } from '@/ui/icons';
  */
 
 type Item = { kind: 'rec'; r: HcRecord; last: boolean } | { kind: 'now' } | { kind: 'empty' };
+type Period = 'all' | '1m' | '3m' | '1y' | 'custom';
+const PERIODS: [Period, string][] = [
+  ['all', 'Vše'],
+  ['1m', 'Měsíc'],
+  ['3m', '3 měsíce'],
+  ['1y', 'Rok'],
+  ['custom', 'Od–do'],
+];
+const PERIOD_TITLE: Record<Period, string> = { all: 'Hledání', '1m': 'Poslední měsíc', '3m': 'Poslední 3 měsíce', '1y': 'Poslední rok', custom: 'Vybrané období' };
 type Section = TimelineDay & { data: Item[]; idx: number };
 
 const PAGE = 200;
@@ -39,20 +49,27 @@ export default function Osa() {
   const [query, setQuery] = useState('');
   const [types, setTypes] = useState<RecordType[]>([]);
   const [onlyFiles, setOnlyFiles] = useState(false);
+  const [period, setPeriod] = useState<Period>('all');
+  const [from, setFrom] = useState(() => addMonthsLocal(toLocalDate(new Date()), -1));
+  const [to, setTo] = useState(() => toLocalDate(new Date()));
   const [searchOpen, setSearchOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [active, setActive] = useState(0);
   const listRef = useRef<SectionList<Item, Section>>(null);
 
-  const filtering = !!query.trim() || types.length > 0 || onlyFiles;
+  const filtering = !!query.trim() || types.length > 0 || onlyFiles || period !== 'all';
+  const range: { from?: string; to?: string } =
+    period === 'all' ? {} : period === 'custom' ? { from: from <= to ? from : to, to: from <= to ? to : from } : { from: addMonthsLocal(today, period === '1m' ? -1 : period === '3m' ? -3 : -12), to: today };
+  const onlyProblems = types.length === PROBLEM_TYPES.length && PROBLEM_TYPES.every((t) => types.includes(t));
+  const filterCount = types.length + (onlyFiles ? 1 : 0) + (period !== 'all' ? 1 : 0);
 
   const { value, loading } = useLoad(async () => {
-    const recs = await data.records.query({ personId: person.id, text: query, types, onlyWithAttachments: onlyFiles, limit: limit + 1 });
+    const recs = await data.records.query({ personId: person.id, text: query, types, onlyWithAttachments: onlyFiles, from: range.from, to: range.to, limit: limit + 1 });
     const more = recs.length > limit;
     const list = more ? recs.slice(0, limit) : recs;
     const files = await data.attachments.forRecords(list.map((r) => r.id));
     return { list, files, more };
-  }, [person.id, query, types.join(','), onlyFiles, limit]);
+  }, [person.id, query, types.join(','), onlyFiles, limit, range.from, range.to]);
 
   const sections: Section[] = useMemo(() => {
     // Naplánované se v ose ukážou až hodinu po svém čase (hledání je najde vždy).
@@ -71,18 +88,20 @@ export default function Osa() {
   }, [value, today, nowTime, filtering, now]);
 
   const total = value?.list.length ?? 0;
+  // Shrnutí potíží, když je vybrané období nebo filtr (např. pro lékaře).
+  const summary = useMemo(() => (filtering ? problemSummary((value?.list ?? []).filter((r) => !isPending(r, now))) : []), [value, filtering, now]);
   const head = sections[Math.min(active, sections.length - 1)];
 
   // Stálá funkce — SectionList nesnese, když se posluchač mění za běhu.
   const onViewable = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
     const first = viewableItems.find((v) => v.section);
     if (first && first.section) setActive((first.section as Section).idx);
-  }, []);
+  }, [setActive]);
 
   const toTop = useCallback(() => {
     if (sections.length) listRef.current?.scrollToLocation({ sectionIndex: 0, itemIndex: 0, viewOffset: 220, animated: false });
     setActive(0);
-  }, [sections.length]);
+  }, [sections.length, setActive]);
 
   const openFile = (a: Attachment) => router.push(`/priloha/${a.id}`);
 
@@ -94,6 +113,7 @@ export default function Osa() {
     setQuery('');
     setTypes([]);
     setOnlyFiles(false);
+    setPeriod('all');
   };
 
   const closeSearch = () => {
@@ -152,6 +172,22 @@ export default function Osa() {
             </View>
           );
         }}
+        ListHeaderComponent={
+          summary.length ? (
+            <View style={{ marginHorizontal: 16, marginBottom: 8, padding: 14, borderRadius: 22, backgroundColor: ui.cardW, borderWidth: 1, borderColor: ui.line, gap: 6 }}>
+              <T w="semibold" style={{ fontSize: 13, color: C.muted }}>{range.from ? `Potíže ${numericDate(range.from)} – ${numericDate(range.to!)}` : 'Potíže ve výběru'}</T>
+              {summary.map((p) => (
+                <View key={p.name} style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
+                  <T w="semibold" style={{ width: 34, fontSize: 15, fontVariant: ['tabular-nums'] }}>{p.count}×</T>
+                  <T style={{ flex: 1, fontSize: 15, lineHeight: 21 }}>
+                    {p.name}
+                    {p.usual ? <T style={{ fontSize: 13, color: C.muted }}>{' · nejčastěji ' + p.usual}</T> : null}
+                  </T>
+                </View>
+              ))}
+            </View>
+          ) : null
+        }
         ListEmptyComponent={
           !loading ? (
             <View style={{ paddingTop: 80, paddingHorizontal: 32, alignItems: 'center', gap: 8 }}>
@@ -183,7 +219,7 @@ export default function Osa() {
       <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0, paddingTop: ins.top, paddingHorizontal: 16 }}>
         <TopBar title={person.name} backLabel="Zpět na přehled" extra={<SearchPill label="Hledat a filtrovat" active={filtering} onPress={() => setSearchOpen(true)} />} />
         <View pointerEvents="none" style={{ marginTop: 18, paddingLeft: 8 }}>
-          <H1>{filtering ? 'Hledání' : head?.title ?? 'Dnes'}</H1>
+          <H1>{filtering ? (query.trim() || period === 'all' ? 'Hledání' : PERIOD_TITLE[period]) : head?.title ?? 'Dnes'}</H1>
           <Muted style={{ marginTop: 4 }}>
             {filtering ? total + ' ' + plural(total, 'záznam', 'záznamy', 'záznamů') : head ? daySummary(head) : ''}
           </Muted>
@@ -198,8 +234,25 @@ export default function Osa() {
           <View style={{ paddingHorizontal: 16, paddingBottom: 32 + Math.max(0, ins.bottom - 128 - 16), gap: 8 }}>
             {filterOpen ? (
               <View style={{ padding: 16, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.97)', borderWidth: 1, borderColor: C.line, boxShadow: '0px 20px 48px rgba(40,40,40,0.12)' }}>
-                <T w="semibold" style={{ fontSize: 13, color: C.muted }}>Typ záznamu</T>
+                <T w="semibold" style={{ fontSize: 13, color: C.muted }}>Období</T>
                 <View style={{ marginTop: 8, flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {PERIODS.map(([k, l]) => (
+                    <Chip key={k} label={l} selected={period === k} onPress={() => setPeriod(k)} />
+                  ))}
+                </View>
+                {period === 'custom' ? (
+                  <View style={{ marginTop: 10, flexDirection: 'row', gap: 8 }}>
+                    <View style={{ flex: 1 }}>
+                      <DateField label="Od" value={from} onChange={setFrom} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <DateField label="Do" value={to} onChange={setTo} />
+                    </View>
+                  </View>
+                ) : null}
+                <T w="semibold" style={{ marginTop: 14, fontSize: 13, color: C.muted }}>Typ záznamu</T>
+                <View style={{ marginTop: 8, flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  <Chip label="Jen potíže" selected={onlyProblems} onPress={() => setTypes(onlyProblems ? [] : PROBLEM_TYPES.slice())} tone="orange" />
                   <Chip label="Vše" selected={types.length === 0} onPress={() => setTypes([])} dot={C.ink} />
                   {RECORD_TYPE_ORDER.map((k) => (
                     <Chip key={k} label={RECORD_TYPES[k].label} selected={types.includes(k)} onPress={() => toggleType(k)} dot={RECORD_TYPES[k].color} />
@@ -246,7 +299,7 @@ export default function Osa() {
                 style={{ height: 40, paddingLeft: 10, paddingRight: 14, borderRadius: 20, backgroundColor: C.pink, flexDirection: 'row', alignItems: 'center', gap: 6 }}
               >
                 <IconFilter size={16} color={C.white} />
-                <T w="semibold" style={{ fontSize: 14, color: C.white }}>{types.length + (onlyFiles ? 1 : 0) ? 'Filtr · ' + (types.length + (onlyFiles ? 1 : 0)) : 'Filtr'}</T>
+                <T w="semibold" style={{ fontSize: 14, color: C.white }}>{filterCount ? 'Filtr · ' + filterCount : 'Filtr'}</T>
               </Pressable>
               <Pressable accessibilityRole="button" accessibilityLabel="Zavřít hledání" onPress={closeSearch} style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
                 <IconClose size={18} width={1.6} />
@@ -260,7 +313,7 @@ export default function Osa() {
         </>
       )}
       {/* Po změně hledání nebo filtru zpátky nahoru */}
-      <ScrollToTopOnChange dep={query + types.join(',') + onlyFiles} run={toTop} />
+      <ScrollToTopOnChange dep={query + types.join(',') + onlyFiles + period + from + to} run={toTop} />
     </View>
   );
 }

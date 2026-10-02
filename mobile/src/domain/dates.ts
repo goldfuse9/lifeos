@@ -201,3 +201,11 @@ export function vocative(name: string): string {
   if (/[bdflmnprstvz]$/i.test(n)) return n + 'e';
   return n;
 }
+
+/** Posun o měsíce (31. 3. − 1 měsíc → 28./29. 2.). */
+export function addMonthsLocal(date: LocalDate, n: number): LocalDate {
+  const [y, m, d] = date.split('-').map(Number);
+  const dt = new Date(y, m - 1 + n, d);
+  if (dt.getDate() !== d) dt.setDate(0);
+  return toLocalDate(dt);
+}

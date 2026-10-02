@@ -138,3 +138,57 @@ export function isPending(r: HcRecord, now: Date): boolean {
   if (!Number.isFinite(created) || at <= created + 5 * 60 * 1000) return false;
   return now.getTime() < (r.time ? at + REVEAL_AFTER_MS : at);
 }
+
+/** Typy, které jsou „potíže“ — rychlá volba ve filtru osy. */
+export const PROBLEM_TYPES: RecordType[] = ['symptom', 'mood', 'cycle'];
+
+export interface ProblemCount {
+  name: string;
+  count: number;
+  /** Část dne, kdy se potíž objevuje nejčastěji (aspoň polovina zápisů). */
+  usual: 'ráno' | 'odpoledne' | 'večer' | 'v noci' | null;
+}
+
+function partOfDay(time: string | null): ProblemCount['usual'] {
+  if (!time) return null;
+  const h = Number(time.slice(0, 2));
+  return h >= 5 && h < 11 ? 'ráno' : h >= 11 && h < 17 ? 'odpoledne' : h >= 17 && h < 22 ? 'večer' : 'v noci';
+}
+
+/** Jednotlivé potíže v záznamu (příznaky, štítky, příznaky cyklu, špatná nálada). */
+export function problemsIn(r: HcRecord): string[] {
+  const out = new Set<string>();
+  const m = r.metadata as RecordMetadata & { cycle?: { symptoms?: string[] } };
+  if (r.type === 'symptom' || r.type === 'mood') {
+    for (const t of m.tags ?? []) out.add(t);
+    for (const c of m.children ?? []) {
+      if (c.type !== 'symptom') continue;
+      for (const s of c.value.replace(/\s·\s.*$/, '').split(/,\s*/)) if (s.trim()) out.add(s.trim()[0].toUpperCase() + s.trim().slice(1));
+    }
+    if (r.type === 'mood' && typeof m.mood === 'number' && m.mood <= 1) out.add('Špatná nálada');
+  }
+  if (r.type === 'cycle') for (const s of m.cycle?.symptoms ?? []) out.add(s);
+  return [...out];
+}
+
+/** Kolikrát se která potíž objevila a kdy nejčastěji — nejčastější nahoře. */
+export function problemSummary(records: HcRecord[], limit = 4): ProblemCount[] {
+  const map = new Map<string, { count: number; parts: Map<string, number> }>();
+  for (const r of records) {
+    const part = partOfDay(r.time);
+    for (const p of problemsIn(r)) {
+      const e = map.get(p) ?? { count: 0, parts: new Map() };
+      e.count++;
+      if (part) e.parts.set(part, (e.parts.get(part) ?? 0) + 1);
+      map.set(p, e);
+    }
+  }
+  return [...map.entries()]
+    .map(([name, e]) => {
+      const [top, second] = [...e.parts.entries()].sort((a, b) => b[1] - a[1]);
+      const usual = top && e.count >= 2 && top[1] * 2 >= e.count && (!second || second[1] < top[1]) ? (top[0] as ProblemCount['usual']) : null;
+      return { name, count: e.count, usual };
+    })
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'cs'))
+    .slice(0, limit);
+}

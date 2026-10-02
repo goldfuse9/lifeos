@@ -157,3 +157,12 @@ nesmí vidět nic ze starého.
 | Odškrtnout lék, Uložit vybrané | V ose dokument s fotkou, v Lécích jen zaškrtnuté, kontrola v kalendáři |
 | Osa → hledat slovo z textu zprávy | Najde dokument |
 | Dokumenty → ikona skeneru v hlavičce | Otevře skener |
+
+## O. Osa — období a shrnutí potíží
+
+| Test | Očekávání |
+| --- | --- |
+| Osa → lupa → Filtr → Období: Měsíc | Nadpis „Poslední měsíc“, jen záznamy za měsíc |
+| + „Jen potíže“ | Jen příznaky, nálady, cyklus; nahoře „Potíže 2. 9. – 2. 10.“ s počty (Bolest hlavy 3× · nejčastěji ráno) |
+| Období Od–do | Dvě data, výpis mezi nimi |
+| Vymazat | Zpět celá osa |
