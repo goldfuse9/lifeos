@@ -3,7 +3,8 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useData, usePerson, useSession } from '@/state/session';
 import { useLoad } from '@/state/useLoad';
-import { DUE_OPTIONS, VACCINES, addYears, suggestedYears, vaccineOf, vaccineRecord } from '@/domain/vaccines';
+import { DUE_OPTIONS, addYears, vaccineOf, vaccineRecord } from '@/domain/vaccines';
+import { VAX_CATALOG, matchVaccine } from '@/domain/vaccineCatalog';
 import { diffDays, numericDate, toLocalDate } from '@/domain/dates';
 import type { HcRecord } from '@/domain/types';
 import { Backdrop, Card, Chip, Field, H1, Loading, PrimaryButton, SecondaryButton, T, TopBar, useToast } from '@/ui/kit';
@@ -11,6 +12,8 @@ import { DateField } from '@/ui/DateTimeField';
 import { confirm } from '@/ui/device';
 import { C } from '@/ui/theme';
 import { IconTrash } from '@/ui/icons';
+
+const suggestedYears = (n: string) => (n.trim() ? matchVaccine(n)?.boosterYears ?? null : null);
 
 /** Zapsat očkování — co, kdy, kdy přeočkovat. */
 export default function OckovaniUpravit() {
@@ -50,7 +53,7 @@ function Form({ rec, name0 }: { rec: HcRecord | null; name0: string }) {
     if (!touchedYears) setYears(suggestedYears(n));
   };
   const nextDue = years ? addYears(date, years) : null;
-  const preset = VACCINES.some((v) => v.name === name);
+  const preset = VAX_CATALOG.some((v) => v.name === name);
 
   const save = async () => {
     setTried(true);
@@ -84,12 +87,16 @@ function Form({ rec, name0 }: { rec: HcRecord | null; name0: string }) {
         <TopBar title={person.name} backLabel="Zavřít" />
         <H1 style={{ marginTop: 18, paddingLeft: 8 }}>{rec ? 'Upravit očkování' : 'Očkování'}</H1>
 
-        <T w="semibold" style={{ marginTop: 20, paddingLeft: 4, fontSize: 13, color: C.muted }}>Proti čemu</T>
-        <View style={{ marginTop: 8, flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-          {VACCINES.map((v) => (
-            <Chip key={v.name} label={v.name} selected={name === v.name} onPress={() => pick(v.name)} dot="#2E9E6B" />
-          ))}
-        </View>
+        {(['povinne', 'doporucene'] as const).map((g) => (
+          <View key={g}>
+            <T w="semibold" style={{ marginTop: 20, paddingLeft: 4, fontSize: 13, color: C.muted }}>{g === 'povinne' ? 'Povinná' : 'Nepovinná'}</T>
+            <View style={{ marginTop: 8, flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+              {VAX_CATALOG.filter((v) => v.group === g).map((v) => (
+                <Chip key={v.key} label={v.name} selected={name === v.name} onPress={() => pick(v.name)} dot={g === 'povinne' ? '#D92D20' : '#2E9E6B'} />
+              ))}
+            </View>
+          </View>
+        ))}
         <Card style={{ marginTop: 12, padding: 16, gap: 14 }}>
           <Field label="Jiné" value={preset ? '' : name} onChangeText={pick} placeholder="Název očkování" maxLength={80} error={tried && !name.trim() ? 'Vyberte nebo napište, proti čemu.' : null} />
           <DateField label="Kdy" value={date} onChange={(d) => (d <= today ? setDate(d) : toast('Datum očkování nemůže být v budoucnu'))} />

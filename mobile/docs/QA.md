@@ -166,3 +166,16 @@ nesmí vidět nic ze starého.
 | + „Jen potíže“ | Jen příznaky, nálady, cyklus; nahoře „Potíže 2. 9. – 2. 10.“ s počty (Bolest hlavy 3× · nejčastěji ráno) |
 | Období Od–do | Dvě data, výpis mezi nimi |
 | Vymazat | Zpět celá osa |
+
+## P. Očkování (stránka)
+
+| Test | Očekávání |
+| --- | --- |
+| Přehled → dlaždice Očkování (vedle Léků) | Stránka Očkování s upozorněními nahoře |
+| Karta dítěte 2 roky, zapsané 2 dávky hexavakcíny | „Chybí povinná očkování … podmínkou přijetí do MŠ“, řádek Hexavakcína „Chybí“ |
+| 1. Povinná / 2. Nepovinná | Sbalitelné; povinná nahoře, v nich nejdřív co potřebuje pozornost |
+| Klepnout na očkování | Rozbalí se: proti čemu, kdy, podané dávky (klepnutí → záznam v ose), „Přeočkovat do“, „+ Zapsat dávku“ |
+| Fialový filtr → K řešení / Podaná / Bez záznamu | Výpis se zúží, nahoře „Filtr: … ✕“ |
+| Načíst z očkovacího průkazu → vyfotit | Seznam „vakcína + datum“ ke kontrole, uloží očkování do osy a fotku k průkazu |
+| Září–listopad | Okénko „Sezóna očkování proti chřipce“ (pokud nebyla letos) |
+| Leden–duben | Okénko „Před sezónou klíšťat“ |

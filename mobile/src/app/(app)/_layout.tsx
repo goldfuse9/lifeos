@@ -26,6 +26,7 @@ export default function AppLayout() {
         <Stack.Screen name="skener" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="ockovani/index" />
         <Stack.Screen name="ockovani/upravit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="ockovani/sken" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="leky/upravit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="cyklus/zapis" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="cyklus/nastaveni" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />

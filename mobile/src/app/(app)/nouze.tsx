@@ -5,7 +5,7 @@ import { useData, usePerson } from '@/state/session';
 import { useLoad } from '@/state/useLoad';
 import { EMERGENCY_FIELDS, emergencyProgress, extractPhone } from '@/domain/emergency';
 import { medsForEmergency } from '@/domain/meds';
-import { tetanusYear } from '@/domain/vaccines';
+import { lastTetanusYear } from '@/domain/vaccineCatalog';
 import type { EmergencyData } from '@/domain/types';
 import { Backdrop, BottomFade, Callout, Card, H1, Muted, Note, PrimaryButton, SecondaryButton, T, TopBar, useScreenInsets, useUi } from '@/ui/kit';
 import { MeFab } from '@/ui/fabs';
@@ -29,7 +29,7 @@ export default function Nouze() {
     // Léky ze seznamu Léky + to, co je ručně v nouzových údajích.
     const meds = [medsForEmergency(m.list ?? []), e.meds].filter(Boolean).join('; ');
     // Tetanus z Očkování, pokud není vyplněný ručně.
-    return { ...e, meds: meds || undefined, tetanus: e.tetanus || tetanusYear(vax) || undefined };
+    return { ...e, meds: meds || undefined, tetanus: e.tetanus || lastTetanusYear(vax) || undefined };
   }, [person.id]);
   const e: EmergencyData = em ?? {};
   const { filled } = emergencyProgress(e);

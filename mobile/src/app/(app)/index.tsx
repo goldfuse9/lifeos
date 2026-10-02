@@ -6,6 +6,7 @@ import { useLoad, useNow } from '@/state/useLoad';
 import { RECORD_TYPES } from '@/domain/recordTypes';
 import { isPending, isUpcoming, recordSubtitle } from '@/domain/timeline';
 import { dosesFor } from '@/domain/meds';
+import { vaxOverview } from '@/domain/vaccineCatalog';
 import { MONTHS_SHORT, WEEKDAYS_SHORT, addDays, longDate, parseLocalDate, plural, relativeDays, startOfWeek, toLocalDate, toLocalTime, vocative } from '@/domain/dates';
 import { Backdrop, BottomFade, Card, DateBadge, Muted, PillButton, T, Tile, useScreenInsets, useUi } from '@/ui/kit';
 import { FabMenu } from '@/ui/fabs';
@@ -49,6 +50,9 @@ export default function Prehled() {
       data.personData.get(person.id, 'meds'),
       data.personData.get(person.id, 'medlog'),
     ]);
+    const vaxRecs = await data.records.query({ personId: person.id, types: ['vaccine'] });
+    const vaxList = vaxOverview(vaxRecs, person.birthDate, today);
+    const vaxTodo = vaxList.filter((v) => v.state === 'due' || v.state === 'missing');
     const doses = dosesFor(meds.list ?? [], medlog, today);
     return {
       upcoming: future.filter((r) => isUpcoming(r, today, nowTime)).slice(0, 8),
@@ -58,8 +62,9 @@ export default function Prehled() {
       medsCount: (meds.list ?? []).filter((m) => m.active).length,
       medsLeft: doses.length ? doses.filter((d) => !d.taken).length : null,
       medsTotal: doses.length,
+      vax: { todo: vaxTodo.length, first: vaxTodo[0]?.name ?? null, given: vaxRecs.length },
     };
-  }, [person.id, today, nowTime, weekStart]);
+  }, [person.id, today, nowTime, weekStart, person.birthDate]);
 
   const viewingOther = !!self && person.id !== self.id;
   const greetName = viewingOther ? person.name : account?.name.split(/\s+/)[0] || person.name;
@@ -115,6 +120,7 @@ export default function Prehled() {
           <TileTimeline onPress={() => router.push('/osa')} />
           {showCycle ? <TileCycle info={cycle.settings.enabled && cycle.settings.mode !== 'těhotenství' ? cycle.info : null} pregnant={cycle.settings.enabled && cycle.settings.mode === 'těhotenství'} onPress={() => router.push('/cyklus')} /> : null}
           <TileMeds left={value?.medsLeft ?? null} total={value?.medsTotal ?? 0} count={value?.medsCount ?? 0} onPress={() => router.push('/leky')} />
+          <TileVax info={value?.vax ?? null} onPress={() => router.push('/ockovani')} />
           <TileDoctors onPress={() => router.push('/lekari')} />
           <TileDocs count={value?.docs ?? 0} onPress={() => router.push('/dokumenty')} />
         </ScrollView>
@@ -306,6 +312,31 @@ function TileMeds({ count, total, left, onPress }: { count: number; total: numbe
       </View>
       <View style={{ position: 'absolute', left: 8, right: 8, bottom: 8, height: 40, paddingHorizontal: 12, borderRadius: 18, backgroundColor: C.white, justifyContent: 'center' }}>
         <T w="semibold" numberOfLines={1} style={{ fontSize: 12, lineHeight: 16, color: C.ink2 }}>{sub}</T>
+      </View>
+    </TileShell>
+  );
+}
+
+function TileVax({ info, onPress }: { info: { todo: number; first: string | null; given: number } | null; onPress: () => void }) {
+  const sub = !info || (!info.given && !info.todo) ? 'Zapsat očkování' : info.todo ? (info.todo === 1 ? info.first! : `${info.todo} k řešení`) : 'vše v pořádku';
+  const warn = !!info?.todo;
+  return (
+    <TileShell title="Očkování" label={'Očkování, ' + sub} onPress={onPress}>
+      <View style={{ position: 'absolute', left: 0, right: 0, top: 64, alignItems: 'center' }}>
+        <View style={{ width: 96, height: 72, borderRadius: 12, backgroundColor: C.white, boxShadow: '0px 10px 24px rgba(40,40,40,0.08)', transform: [{ rotate: '-6deg' }], padding: 10, gap: 6 }}>
+          <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+            <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#E0F5EC', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#2E9E6B' }} />
+            </View>
+            {bar(46, '#D9D8DC')}
+          </View>
+          {bar(64)}
+          {bar(40)}
+        </View>
+        {warn ? <View style={{ position: 'absolute', top: -6, right: 46, width: 14, height: 14, borderRadius: 7, backgroundColor: C.orange, borderWidth: 2, borderColor: C.white }} /> : null}
+      </View>
+      <View style={{ position: 'absolute', left: 8, right: 8, bottom: 8, height: 40, paddingHorizontal: 12, borderRadius: 18, backgroundColor: C.white, justifyContent: 'center' }}>
+        <T w="semibold" numberOfLines={1} style={{ fontSize: 12, lineHeight: 16, color: warn ? C.orangeInk : C.ink2 }}>{sub}</T>
       </View>
     </TileShell>
   );
