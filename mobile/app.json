@@ -19,7 +19,7 @@
       "package": "cz.humancare.prototype",
       "allowBackup": false,
       "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF",
+        "backgroundColor": "#D4F81B",
         "foregroundImage": "./assets/android-icon-foreground.png"
       },
       "predictiveBackGestureEnabled": false
@@ -31,8 +31,8 @@
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",
-          "imageWidth": 160,
-          "backgroundColor": "#FCFBFA"
+          "imageWidth": 200,
+          "backgroundColor": "#D4F81B"
         }
       ],
       [
