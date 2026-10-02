@@ -6,6 +6,8 @@ import { useMeds } from '@/state/useMeds';
 import { TIME_PRESETS, medChanged, medRecord, type Med, type MedChange } from '@/domain/meds';
 import { toLocalDate, toLocalTime } from '@/domain/dates';
 import { newId } from '@/platform/secure';
+import { drugRegistryAvailable, suggestDrugs } from '@/data/drugRegistry';
+import type { DrugSuggestion } from '@/domain/drugRegistry';
 import { notificationPermission } from '@/platform/notifications';
 import { Backdrop, Card, Chip, Field, H1, Loading, PrimaryButton, SecondaryButton, T, ToggleRow, TopBar, useToast } from '@/ui/kit';
 import { TimeField } from '@/ui/DateTimeField';
@@ -36,6 +38,15 @@ function Form({ meds, med }: { meds: Med[]; med: Med | null }) {
   const toast = useToast();
 
   const [name, setName] = useState(med?.name ?? '');
+  const [codes, setCodes] = useState<{ suklCode?: string; atc?: string }>({ suklCode: med?.suklCode, atc: med?.atc });
+  const [picked, setPicked] = useState(!!med);
+  const suggestions = !picked && name.trim().length >= 2 ? suggestDrugs(name, 5) : [];
+  const pickDrug = (d: DrugSuggestion) => {
+    setName(d.name);
+    if (!dose.trim() && d.strength) setDose(d.strength);
+    setCodes({ suklCode: d.code, atc: d.atc });
+    setPicked(true);
+  };
   const [dose, setDose] = useState(med?.dose ?? '');
   const [times, setTimes] = useState<string[]>(med?.times ?? ['08:00']);
   const [remind, setRemind] = useState(med?.remind ?? settings.remindersEnabled);
@@ -74,7 +85,7 @@ function Form({ meds, med }: { meds: Med[]; med: Med | null }) {
     if (!name.trim()) return;
     setBusy(true);
     try {
-      const next: Med = { id: med?.id ?? newId(), name: name.trim(), dose: dose.trim() || undefined, times, remind: remind && times.length > 0, active: med?.active ?? true, note: note.trim() || undefined, since: med?.since ?? today, until: med?.until };
+      const next: Med = { id: med?.id ?? newId(), name: name.trim(), dose: dose.trim() || undefined, times, remind: remind && times.length > 0, active: med?.active ?? true, note: note.trim() || undefined, since: med?.since ?? today, until: med?.until, suklCode: codes.suklCode, atc: codes.atc };
       const list = med ? meds.map((m) => (m.id === med.id ? next : m)) : [...meds, next];
       const change: MedChange | null = !med ? 'start' : med.active && medChanged(med, next) ? 'change' : null;
       await write(list, change, next);
@@ -110,7 +121,29 @@ function Form({ meds, med }: { meds: Med[]; med: Med | null }) {
         <H1 style={{ marginTop: 18, paddingLeft: 8 }}>{med ? 'Upravit lék' : 'Nový lék'}</H1>
 
         <Card style={{ marginTop: 16, padding: 16, gap: 14 }}>
-          <Field label="Název" value={name} onChangeText={setName} placeholder="Např. Euthyrox" maxLength={80} error={tried && !name.trim() ? 'Vyplňte název.' : null} />
+          <Field
+            label="Název"
+            value={name}
+            onChangeText={(v) => {
+              setName(v);
+              setPicked(false);
+              setCodes({});
+            }}
+            placeholder={drugRegistryAvailable() ? 'Začněte psát, např. Euthyrox' : 'Např. Euthyrox'}
+            autoCorrect={false}
+            maxLength={80}
+            error={tried && !name.trim() ? 'Vyplňte název.' : null}
+          />
+          {suggestions.length ? (
+            <View accessibilityRole="list" style={{ marginTop: -6, borderRadius: 16, borderWidth: 1, borderColor: C.line, backgroundColor: C.white, overflow: 'hidden' }}>
+              {suggestions.map((d, i) => (
+                <Pressable key={d.code + i} accessibilityRole="button" onPress={() => pickDrug(d)} style={({ pressed }) => ({ paddingVertical: 10, paddingHorizontal: 14, borderTopWidth: i ? 1 : 0, borderTopColor: C.line, backgroundColor: pressed ? '#F4F4F3' : 'transparent' })}>
+                  <T w="semibold" numberOfLines={1} style={{ fontSize: 15, lineHeight: 20 }}>{[d.name, d.strength].filter(Boolean).join(' ')}</T>
+                  <T numberOfLines={1} style={{ fontSize: 13, lineHeight: 18, color: C.muted }}>{d.form}</T>
+                </Pressable>
+              ))}
+            </View>
+          ) : null}
           <Field label="Dávka" value={dose} onChangeText={setDose} placeholder="1 tableta, 50 µg, 10 kapek…" maxLength={60} />
         </Card>
 

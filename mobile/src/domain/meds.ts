@@ -19,6 +19,9 @@ export interface Med {
   note?: string;
   since?: LocalDate;
   until?: LocalDate;
+  /** Kód SÚKL a ATC z registru léků (pro export do FHIR). */
+  suklCode?: string;
+  atc?: string;
 }
 
 export interface MedList {

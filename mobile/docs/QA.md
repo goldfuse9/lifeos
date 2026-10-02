@@ -145,3 +145,15 @@ nesmí vidět nic ze starého.
 | Klepnout na Záznam | Nový záznam |
 | Zamčená obrazovka → upravit → widget LifeOS „+“ | Otevře zápis po odemknutí |
 | Widget neukazuje žádná zdravotní data | ✅ |
+
+## N. Registr léků a chytrý skener
+
+| Test | Očekávání |
+| --- | --- |
+| (po importu SÚKL) Léky → Přidat → „euthy“ | Návrhy „Euthyrox 50 µg · tableta“; výběr doplní dávku |
+| Přehled → zelené → modré (skener) → vyfotit zprávu | „Zkontrolujte“: dokument, léky, kontrola |
+| Zpráva s „Euthyrox 50 mcg 1-0-0“ | Lék Euthyrox 50 µg, ráno 8:00 |
+| „Kontrola za 3 měsíce“ | Kontrola o 3 měsíce po datu zprávy |
+| Odškrtnout lék, Uložit vybrané | V ose dokument s fotkou, v Lécích jen zaškrtnuté, kontrola v kalendáři |
+| Osa → hledat slovo z textu zprávy | Najde dokument |
+| Dokumenty → ikona skeneru v hlavičce | Otevře skener |

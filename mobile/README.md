@@ -66,12 +66,26 @@ npx expo run:android
 2. `node scripts/import-lekari.mjs ~/Downloads/<soubor>.csv`
 3. Sestavte aplikaci znovu. Bez tohoto kroku zůstává jen ruční zadání.
 
+## Registr léků SÚKL (našeptávání, kódy pro FHIR)
+
+1. Stáhněte a rozbalte ZIP „Databáze léčivých přípravků DLP“:
+   https://opendata.sukl.cz/?q=katalog%2Fdatabaze-lecivych-pripravku-dlp
+2. `node scripts/import-leky.mjs ~/Downloads/DLP<datum>` (složka s CSV)
+3. Sestavte aplikaci znovu. K léku se uloží kód SÚKL a ATC.
+
+## Chytrý skener
+
+Text z fotky čte telefon (Google ML Kit, latinka vč. češtiny) — nic
+neodchází na internet. Údaje (léky s dávkováním, kontrola, lékař,
+diagnózy MKN-10) vytahují pravidla v `src/domain/scanParse.ts`; uživatel
+je před uložením vždy zkontroluje.
+
 ## Kontroly
 
 ```bash
 npm run typecheck   # TypeScript
 npx eslint src      # lint (pravidla React Compileru)
-npm test            # doména, datová vrstva, přihlášení — 24 testů v Node
+npm test            # doména, datová vrstva, přihlášení, záloha, skener — testy v Node
 ```
 
 Ruční test na telefonu: [docs/QA.md](docs/QA.md).
