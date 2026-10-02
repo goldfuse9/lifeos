@@ -23,6 +23,7 @@ export default function AppLayout() {
         <Stack.Screen name="cyklus/index" />
         <Stack.Screen name="leky/index" />
         <Stack.Screen name="tapeta" />
+        <Stack.Screen name="prevence" />
         <Stack.Screen name="skener" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="ockovani/index" />
         <Stack.Screen name="ockovani/upravit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />

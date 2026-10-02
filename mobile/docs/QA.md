@@ -179,3 +179,12 @@ nesmí vidět nic ze starého.
 | Načíst z očkovacího průkazu → vyfotit | Seznam „vakcína + datum“ ke kontrole, uloží očkování do osy a fotku k průkazu |
 | Září–listopad | Okénko „Sezóna očkování proti chřipce“ (pokud nebyla letos) |
 | Leden–duben | Okénko „Před sezónou klíšťat“ |
+
+## Q. Prevence
+
+| Test | Očekávání |
+| --- | --- |
+| Přehled → dlaždice Prevence | Seznam prohlídek podle věku a pohlaví (doplnit v Osobních údajích) |
+| Muž 41 let | Praktik, Zubař; žena 50 let navíc Gynekolog, Mamografie, Střevo |
+| Rozkliknout → Naplánovat | Nový termín (návštěva) s datem, připomínkou; v Prevenci „Naplánováno“, v kalendáři |
+| Rozkliknout → Byl/a jsem — zapsat | Návštěva dnes v ose, v Prevenci „Naposledy … · další od …“ |

@@ -147,6 +147,15 @@ export default function Settings() {
           <Row title="Moji lékaři" sub={value?.doctors ? value.doctors + ' · přidat, upravit, odebrat' : 'Zatím žádný'} onPress={() => router.push('/nastaveni/lekari')} />
           <Divider />
           <Row
+            title="Prevence"
+            sub="Preventivní prohlídky a screeningy"
+            onPress={() => {
+              router.back();
+              router.push('/prevence');
+            }}
+          />
+          <Divider />
+          <Row
             title="Očkování"
             sub="Co, kdy a kdy přeočkovat"
             onPress={() => {

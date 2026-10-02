@@ -9,6 +9,7 @@ import type { PickedFile } from '@/services/attachments';
 import { Backdrop, Card, Chip, Field, H1, Loading, PrimaryButton, Segmented, T, TopBar, useScreenInsets, useToast } from '@/ui/kit';
 import { DateField, TimeField } from '@/ui/DateTimeField';
 import { isPending } from '@/domain/timeline';
+import { prevDef } from '@/domain/prevention';
 import { REMIND_KEYS, remindOf, type RemindKey } from '@/domain/reminders';
 import { notificationPermission } from '@/platform/notifications';
 import { chooseSource, confirm, pickFrom } from '@/ui/device';
@@ -39,7 +40,9 @@ const PLACEHOLDER: Record<RecordType, string> = {
 const WITH_PLACE: RecordType[] = ['event', 'visit', 'result'];
 
 export default function RecordEditor() {
-  const params = useLocalSearchParams<{ id?: string; date?: string; type?: string }>();
+  const params = useLocalSearchParams<{ id?: string; date?: string; type?: string; prevence?: string }>();
+  // Z Prevence: předvyplněný název a vazba na prohlídku.
+  const prev = params.prevence ? prevDef(String(params.prevence)) : null;
   const data = useData();
   const person = usePerson();
   const { touch, settings, updateSettings } = useSession();
@@ -54,7 +57,7 @@ export default function RecordEditor() {
   const defaultTime = initialDate > toLocalDate(now) ? '09:00' : toLocalTime(now);
 
   const [type, setType] = useState<RecordType>(initialType);
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(prev?.name ?? '');
   const [date, setDate] = useState(initialDate);
   const [allDay, setAllDay] = useState(false);
   const [time, setTime] = useState(defaultTime);
@@ -144,7 +147,7 @@ export default function RecordEditor() {
     setBusy(true);
     try {
       const prevMeta: RecordMetadata = loaded?.metadata ?? {};
-      const metadata: RecordMetadata = { ...prevMeta };
+      const metadata: RecordMetadata = { ...prevMeta, ...(prev && !loaded ? { prevention: prev.key } : {}) };
       if (WITH_PLACE.includes(type) && place.trim()) metadata.place = place.trim();
       else delete metadata.place;
       if (type === 'result' && assess !== 'none') {

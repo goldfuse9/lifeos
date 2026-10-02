@@ -7,7 +7,8 @@ import { RECORD_TYPES } from '@/domain/recordTypes';
 import { isPending, isUpcoming, recordSubtitle } from '@/domain/timeline';
 import { dosesFor } from '@/domain/meds';
 import { vaxOverview } from '@/domain/vaccineCatalog';
-import { MONTHS_SHORT, WEEKDAYS_SHORT, addDays, longDate, parseLocalDate, plural, relativeDays, startOfWeek, toLocalDate, toLocalTime, vocative } from '@/domain/dates';
+import { applicable, preventionOverview } from '@/domain/prevention';
+import { MONTHS_SHORT, WEEKDAYS_SHORT, addDays, longDate, numericDate, parseLocalDate, plural, relativeDays, startOfWeek, toLocalDate, toLocalTime, vocative } from '@/domain/dates';
 import { Backdrop, BottomFade, Card, DateBadge, Muted, PillButton, T, Tile, useScreenInsets, useUi } from '@/ui/kit';
 import { FabMenu } from '@/ui/fabs';
 import { PrehledSearch } from '@/ui/PrehledSearch';
@@ -16,7 +17,7 @@ import { CY } from '@/ui/cycleViz';
 import type { CycleInfo } from '@/domain/cycle';
 import { Wordmark } from '@/ui/Wordmark';
 import { C } from '@/ui/theme';
-import { IconCalendar, IconClose, IconPlus } from '@/ui/icons';
+import { IconCalendar, IconClose, IconPlus, IconShield } from '@/ui/icons';
 import type { HcRecord } from '@/domain/types';
 
 /**
@@ -53,6 +54,10 @@ export default function Prehled() {
     const vaxRecs = await data.records.query({ personId: person.id, types: ['vaccine'] });
     const vaxList = vaxOverview(vaxRecs, person.birthDate, today);
     const vaxTodo = vaxList.filter((v) => v.state === 'due' || v.state === 'missing');
+    const [prevRecs, personal] = await Promise.all([data.records.query({ personId: person.id, types: ['visit', 'event', 'result'] }), data.personData.get(person.id, 'personal')]);
+    const prevList = preventionOverview(applicable(person.birthDate, personal, today), prevRecs, today);
+    const prevNow = prevList.filter((p) => p.state === 'now');
+    const prevPlanned = prevList.find((p) => p.state === 'planned')?.planned ?? null;
     const doses = dosesFor(meds.list ?? [], medlog, today);
     return {
       upcoming: future.filter((r) => isUpcoming(r, today, nowTime)).slice(0, 8),
@@ -63,6 +68,7 @@ export default function Prehled() {
       medsLeft: doses.length ? doses.filter((d) => !d.taken).length : null,
       medsTotal: doses.length,
       vax: { todo: vaxTodo.length, first: vaxTodo[0]?.name ?? null, given: vaxRecs.length },
+      prev: { now: prevNow.length, first: prevNow[0]?.def.name ?? null, planned: prevPlanned ? prevPlanned.date : null },
     };
   }, [person.id, today, nowTime, weekStart, person.birthDate]);
 
@@ -121,6 +127,7 @@ export default function Prehled() {
           {showCycle ? <TileCycle info={cycle.settings.enabled && cycle.settings.mode !== 'těhotenství' ? cycle.info : null} pregnant={cycle.settings.enabled && cycle.settings.mode === 'těhotenství'} onPress={() => router.push('/cyklus')} /> : null}
           <TileMeds left={value?.medsLeft ?? null} total={value?.medsTotal ?? 0} count={value?.medsCount ?? 0} onPress={() => router.push('/leky')} />
           <TileVax info={value?.vax ?? null} onPress={() => router.push('/ockovani')} />
+          <TilePrev info={value?.prev ?? null} onPress={() => router.push('/prevence')} />
           <TileDoctors onPress={() => router.push('/lekari')} />
           <TileDocs count={value?.docs ?? 0} onPress={() => router.push('/dokumenty')} />
         </ScrollView>
@@ -334,6 +341,26 @@ function TileVax({ info, onPress }: { info: { todo: number; first: string | null
           {bar(40)}
         </View>
         {warn ? <View style={{ position: 'absolute', top: -6, right: 46, width: 14, height: 14, borderRadius: 7, backgroundColor: C.orange, borderWidth: 2, borderColor: C.white }} /> : null}
+      </View>
+      <View style={{ position: 'absolute', left: 8, right: 8, bottom: 8, height: 40, paddingHorizontal: 12, borderRadius: 18, backgroundColor: C.white, justifyContent: 'center' }}>
+        <T w="semibold" numberOfLines={1} style={{ fontSize: 12, lineHeight: 16, color: warn ? C.orangeInk : C.ink2 }}>{sub}</T>
+      </View>
+    </TileShell>
+  );
+}
+
+function TilePrev({ info, onPress }: { info: { now: number; first: string | null; planned: string | null } | null; onPress: () => void }) {
+  const sub = !info ? 'Prohlídky' : info.now ? (info.now === 1 ? 'Nárok: ' + info.first : `${info.now} prohlídky k objednání`) : info.planned ? 'Naplánováno ' + numericDate(info.planned) : 'vše hotovo';
+  const warn = !!info?.now;
+  return (
+    <TileShell title={'Prevence'} label={'Prevence, ' + sub} onPress={onPress}>
+      <View style={{ position: 'absolute', left: 0, right: 0, top: 62, alignItems: 'center' }}>
+        <View style={{ width: 78, height: 78, borderRadius: 39, backgroundColor: '#E8EFFD', alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 8px 20px rgba(59,111,224,0.18)' }}>
+            <IconShield size={22} color="#3B6FE0" width={1.8} />
+          </View>
+        </View>
+        {warn ? <View style={{ position: 'absolute', top: -4, right: 56, width: 14, height: 14, borderRadius: 7, backgroundColor: C.orange, borderWidth: 2, borderColor: C.white }} /> : null}
       </View>
       <View style={{ position: 'absolute', left: 8, right: 8, bottom: 8, height: 40, paddingHorizontal: 12, borderRadius: 18, backgroundColor: C.white, justifyContent: 'center' }}>
         <T w="semibold" numberOfLines={1} style={{ fontSize: 12, lineHeight: 16, color: warn ? C.orangeInk : C.ink2 }}>{sub}</T>
