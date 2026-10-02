@@ -66,3 +66,19 @@ test('naplánovaný záznam se v ose ukáže až hodinu po termínu', () => {
   expect(isPending({ ...base, date: '2026-10-03', time: null } as HcRecord, new Date(2026, 9, 2, 23, 0))).toBe(true);
   expect(isPending({ ...base, date: '2026-10-03', time: null } as HcRecord, new Date(2026, 9, 3, 0, 1))).toBe(false);
 });
+
+test('kalendář ukazuje jen plánované termíny', () => {
+  const { isPlanned, plannedByDay } = jest.requireActual('@/domain/timeline') as typeof import('@/domain/timeline');
+  const mk = (type: HcRecord['type'], date: string, time: string | null, createdAt: string): HcRecord => ({ ...rec(date, time, type), type, createdAt });
+  const planned = mk('visit', '2026-10-10', '09:00', '2026-10-01T10:00:00');
+  const noted = mk('visit', '2026-10-01', '10:00', '2026-10-01T10:01:00');
+  const mood = mk('mood', '2026-10-10', '09:00', '2026-10-01T10:00:00');
+  const event = mk('event', '2026-10-02', null, '2026-10-02T08:00:00');
+  expect(isPlanned(planned)).toBe(true);
+  expect(isPlanned(noted)).toBe(false);
+  expect(isPlanned(mood)).toBe(false);
+  expect(isPlanned(event)).toBe(true);
+  const m = plannedByDay([planned, noted, mood, event]);
+  expect(m.get('2026-10-10')).toBe(1);
+  expect(m.get('2026-10-01')).toBeUndefined();
+});

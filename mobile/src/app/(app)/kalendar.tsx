@@ -5,7 +5,7 @@ import { useData, usePerson } from '@/state/session';
 import { useLoad, useNow } from '@/state/useLoad';
 import { CAL_WEEKDAYS, MONTHS_GEN, MONTHS_NOM, WEEKDAYS_SHORT, isValidLocalDate, monthGrid, parseLocalDate, plural, toLocalDate } from '@/domain/dates';
 import { RECORD_TYPES } from '@/domain/recordTypes';
-import { recordSubtitle } from '@/domain/timeline';
+import { isPlanned, plannedByDay, recordSubtitle } from '@/domain/timeline';
 import { Backdrop, Card, H1, Muted, PillButton, PrimaryButton, T, TopBar, useScreenInsets } from '@/ui/kit';
 import { TypeDot } from '@/ui/records';
 import { C } from '@/ui/theme';
@@ -31,8 +31,9 @@ export default function Kalendar() {
   });
 
   const grid = monthGrid(ym.y, ym.m);
-  const { value: dots } = useLoad(() => data.records.datesWithRecords(person.id, grid[0], grid[41]), [person.id, grid[0]]);
-  const { value: dayRecs } = useLoad(() => data.records.query({ personId: person.id, from: sel, to: sel, order: 'asc' }), [person.id, sel]);
+  // Kalendář = jen domluvené termíny; nálady a zápisy jsou v ose.
+  const { value: dots } = useLoad(async () => plannedByDay(await data.records.query({ personId: person.id, from: grid[0], to: grid[41] })), [person.id, grid[0]]);
+  const { value: dayRecs } = useLoad(async () => (await data.records.query({ personId: person.id, from: sel, to: sel, order: 'asc' })).filter(isPlanned), [person.id, sel]);
 
   const shift = (n: number) => setYm(({ y, m }) => {
     const d = new Date(y, m + n, 1);
@@ -89,7 +90,7 @@ export default function Kalendar() {
                     key={d}
                     accessibilityRole="button"
                     accessibilityState={{ selected: isSel }}
-                    accessibilityLabel={(isToday ? 'Dnes, ' : '') + WEEKDAYS_SHORT[dt.getDay()] + ' ' + dt.getDate() + '. ' + MONTHS_GEN[dt.getMonth()] + (n ? ', ' + n + ' ' + plural(n, 'záznam', 'záznamy', 'záznamů') : '')}
+                    accessibilityLabel={(isToday ? 'Dnes, ' : '') + WEEKDAYS_SHORT[dt.getDay()] + ' ' + dt.getDate() + '. ' + MONTHS_GEN[dt.getMonth()] + (n ? ', ' + n + ' ' + plural(n, 'termín', 'termíny', 'termínů') : '')}
                     onPress={() => {
                       setSel(d);
                       if (!inMonth) setYm({ y: dt.getFullYear(), m: dt.getMonth() });

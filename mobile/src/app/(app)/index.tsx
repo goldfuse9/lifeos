@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { useData, usePerson, useSession } from '@/state/session';
 import { useLoad, useNow } from '@/state/useLoad';
 import { RECORD_TYPES } from '@/domain/recordTypes';
-import { isPending, isUpcoming, recordSubtitle } from '@/domain/timeline';
+import { isPending, isPlanned, isUpcoming, plannedByDay, recordSubtitle } from '@/domain/timeline';
 import { dosesFor } from '@/domain/meds';
 import { vaxOverview } from '@/domain/vaccineCatalog';
 import { applicable, preventionOverview } from '@/domain/prevention';
@@ -17,7 +17,8 @@ import { CY } from '@/ui/cycleViz';
 import type { CycleInfo } from '@/domain/cycle';
 import { Wordmark } from '@/ui/Wordmark';
 import { C } from '@/ui/theme';
-import { IconCalendar, IconClose, IconPlus, IconShield } from '@/ui/icons';
+import { IconCalendar, IconClose, IconHeart, IconPlus, IconShield } from '@/ui/icons';
+import { useTodo } from '@/state/useTodo';
 import type { HcRecord } from '@/domain/types';
 
 /**
@@ -39,6 +40,7 @@ export default function Prehled() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const cycle = useCycle();
+  const todo = useTodo();
   const showCycle = (!!cycle.settings.enabled && !cycle.settings.hideOnOverview) || cycle.suggest;
 
   const weekStart = startOfWeek(today);
@@ -47,7 +49,7 @@ export default function Prehled() {
       data.records.query({ personId: person.id, from: today, order: 'asc', limit: 30 }),
       data.records.query({ personId: person.id, to: today, order: 'desc', limit: 40 }),
       data.attachments.forPerson(person.id),
-      data.records.datesWithRecords(person.id, weekStart, addDays(weekStart, 6)),
+      data.records.query({ personId: person.id, from: weekStart, to: addDays(weekStart, 6) }).then(plannedByDay),
       data.personData.get(person.id, 'meds'),
       data.personData.get(person.id, 'medlog'),
     ]);
@@ -60,7 +62,7 @@ export default function Prehled() {
     const prevPlanned = prevList.find((p) => p.state === 'planned')?.planned ?? null;
     const doses = dosesFor(meds.list ?? [], medlog, today);
     return {
-      upcoming: future.filter((r) => isUpcoming(r, today, nowTime)).slice(0, 8),
+      upcoming: future.filter((r) => isPlanned(r) && isUpcoming(r, today, nowTime)).slice(0, 8),
       recent: past.filter((r) => !isUpcoming(r, today, nowTime) && !isPending(r, new Date())).slice(0, 6),
       docs: docs.length,
       week,
@@ -95,8 +97,13 @@ export default function Prehled() {
       <ScrollView contentContainerStyle={{ paddingTop: ins.top, paddingHorizontal: 16, paddingBottom: ins.bottom }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 44, paddingLeft: 6 }}>
           <Wordmark />
-          <PillButton accessibilityRole="button" accessibilityLabel="Kalendář" onPress={() => router.push('/kalendar')}>
-            <IconCalendar color={C.muted} />
+          <PillButton accessibilityRole="button" accessibilityLabel={todo.items.length ? `K vyřešení: ${todo.items.length}` : 'K vyřešení'} onPress={() => router.push('/k-reseni')}>
+            <IconHeart color={todo.items.length ? '#E0457B' : C.muted} width={1.9} />
+            {todo.items.length ? (
+              <View style={{ position: 'absolute', top: -2, right: -2, minWidth: 18, height: 18, paddingHorizontal: 5, borderRadius: 9, backgroundColor: '#E0457B', borderWidth: 2, borderColor: C.white, alignItems: 'center', justifyContent: 'center' }}>
+                <T w="semibold" style={{ fontSize: 10, lineHeight: 12, color: C.white }}>{todo.items.length > 9 ? '9+' : todo.items.length}</T>
+              </View>
+            ) : null}
           </PillButton>
         </View>
 
@@ -141,11 +148,16 @@ export default function Prehled() {
                 {up.length ? up.length + ' ' + plural(up.length, 'termín', 'termíny', 'termínů') : 'Nic naplánováno'}
               </Muted>
             </View>
-            {restUp.length ? (
-              <Pressable accessibilityRole="button" accessibilityState={{ expanded: openUp }} onPress={() => setOpenUp((o) => !o)} style={{ height: 44, paddingHorizontal: 16, borderRadius: 22, backgroundColor: C.white, justifyContent: 'center', boxShadow: '0px 6px 18px rgba(40,40,40,0.08)' }}>
-                <T w="semibold" style={{ fontSize: 13, color: C.ink2 }}>{openUp ? 'Méně' : '+' + restUp.length}</T>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              {restUp.length ? (
+                <Pressable accessibilityRole="button" accessibilityState={{ expanded: openUp }} onPress={() => setOpenUp((o) => !o)} style={{ height: 44, paddingHorizontal: 16, borderRadius: 22, backgroundColor: C.white, justifyContent: 'center', boxShadow: '0px 6px 18px rgba(40,40,40,0.08)' }}>
+                  <T w="semibold" style={{ fontSize: 13, color: C.ink2 }}>{openUp ? 'Méně' : '+' + restUp.length}</T>
+                </Pressable>
+              ) : null}
+              <Pressable accessibilityRole="button" accessibilityLabel="Kalendář" onPress={() => router.push('/kalendar')} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 6px 18px rgba(40,40,40,0.08)' }}>
+                <IconCalendar size={18} color={C.ink2} />
               </Pressable>
-            ) : null}
+            </View>
           </View>
 
           <Pressable

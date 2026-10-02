@@ -192,3 +192,24 @@ export function problemSummary(records: HcRecord[], limit = 4): ProblemCount[] {
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'cs'))
     .slice(0, limit);
 }
+
+/**
+ * Patří záznam do kalendáře? Kalendář je na domluvené termíny, ne na
+ * zápisy: Termín vždy; návštěva, výsledek, dokument nebo poznámka jen
+ * tehdy, když byla zapsaná dopředu (čas je pozdější než zápis).
+ * Nálady, příznaky, cyklus, léky a očkování patří jen do osy.
+ */
+export function isPlanned(r: HcRecord): boolean {
+  if (r.type === 'event') return true;
+  if (r.type !== 'visit' && r.type !== 'result' && r.type !== 'doc' && r.type !== 'note') return false;
+  const created = Date.parse(r.createdAt);
+  if (!Number.isFinite(created)) return false;
+  return combine(r.date, r.time).getTime() > created + 5 * 60 * 1000;
+}
+
+/** Počet plánovaných termínů po dnech (tečky v kalendáři). */
+export function plannedByDay(records: HcRecord[]): Map<LocalDate, number> {
+  const m = new Map<LocalDate, number>();
+  for (const r of records) if (isPlanned(r)) m.set(r.date, (m.get(r.date) ?? 0) + 1);
+  return m;
+}

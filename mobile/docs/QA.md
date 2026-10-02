@@ -188,3 +188,10 @@ nesmí vidět nic ze starého.
 | Muž 41 let | Praktik, Zubař; žena 50 let navíc Gynekolog, Mamografie, Střevo |
 | Rozkliknout → Naplánovat | Nový termín (návštěva) s datem, připomínkou; v Prevenci „Naplánováno“, v kalendáři |
 | Rozkliknout → Byl/a jsem — zapsat | Návštěva dnes v ose, v Prevenci „Naposledy … · další od …“ |
+
+## R. Srdce „K vyřešení“ a kalendář jen pro termíny
+1. Přehled vpravo nahoře: srdce místo kalendáře; růžový odznak = počet věcí k vyřešení.
+2. Srdce → seznam po oblastech (prevence, očkování, léky, nouzová karta, cyklus, záloha); klepnutí otevře příslušnou stránku. Když nic nečeká: „Všechno v pořádku“.
+3. Kalendář je v hlavičce „Blíží se“ (bílé kulaté tlačítko).
+4. Zapsat náladu / příznak / poznámku na dnes → v kalendáři ani v týdenním pásu se neobjeví (jen v Ose).
+5. Naplánovat návštěvu na jiný den → tečka v kalendáři i týdenním pásu, objeví se v „Blíží se“.
