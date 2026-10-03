@@ -61,6 +61,22 @@ button:focus-visible,a:focus-visible{outline:2px solid #17161A;outline-offset:2p
       </sc-if>
     </div>
 
+    <!-- Školka prosí o vyzvednutí. Je to jediná věc v appce, která nepočká,
+         takže visí nahoře na KAŽDÉ kartě, dokud rodič neřekne „Přijedu“.
+         Jinak by ji uviděl, jen kdyby zrovna měl otevřenou kartu dítěte. -->
+    <sc-if value="{{skBanner.show}}" hint-placeholder-val="{{false}}">
+      <button onClick="{{skBanner.open}}" style="margin-top: 12px; width: 100%; padding: 12px; display: flex; gap: 12px; align-items: center; background: #FFF1E0; border: 1px solid #FBD3A6; border-radius: 22px; font: inherit; text-align: left; color: #17161A; cursor: pointer;">
+        <span aria-hidden="true" style="flex-shrink: 0; width: 44px; height: 44px; border-radius: 16px; background: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+          <svg width="36" height="36" viewBox="0 0 48 48"><g stroke="#17181A" stroke-width="2" stroke-linejoin="round"><circle cx="24" cy="35" r="10" fill="#FFFFFF"></circle><circle cx="24" cy="20" r="7" fill="#FFFFFF"></circle><rect x="18" y="5" width="12" height="8" rx="1.5" fill="#E0302B"></rect><rect x="15.5" y="12" width="17" height="3" rx="1.5" fill="#E0302B"></rect><path d="M24 21l5 1.5-5 1z" fill="#F28C28" stroke-width="1"></path></g><circle cx="21.5" cy="19" r="1.3" fill="#17181A"></circle><circle cx="26.5" cy="19" r="1.3" fill="#17181A"></circle><circle cx="24" cy="31" r="1.4" fill="#17181A"></circle><circle cx="24" cy="37" r="1.4" fill="#17181A"></circle></svg>
+        </span>
+        <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column;">
+          <span style="font-size: 15px; line-height: 20px; font-weight: 600; color: #7A4300;">{{skBanner.title}}</span>
+          <span style="font-size: 13px; line-height: 18px; color: #6B4A1E;">{{skBanner.sub}}</span>
+        </span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A4300" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="m9 6 6 6-6 6"></path></svg>
+      </button>
+    </sc-if>
+
     <sc-if value="{{person.needsProof}}" hint-placeholder-val="{{false}}">
       <div style="margin-top: 12px; padding: 12px; display: flex; gap: 10px; align-items: flex-start; background: #FFF4E6; border: 1px dashed #F7B56A; border-radius: 20px;">
         <span style="flex-shrink: 0; width: 28px; height: 28px; border-radius: 14px; background: #FFFFFF; color: #E8830C; display: flex; align-items: center; justify-content: center;">
@@ -75,6 +91,27 @@ button:focus-visible,a:focus-visible{outline:2px solid #17161A;outline-offset:2p
     </sc-if>
 
     <div class="px-scroll" style="margin: 12px -16px 0; padding: 4px 16px 8px; display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 16px;">
+
+      <!-- Školka. Jen na kartě dítěte od 3 do 7 let, které do školky chodí —
+           a pak jako PRVNÍ dlaždice, protože ve všední den je to to, co rodič
+           chce vědět. Stejná stavba jako osa a lékaři: nadpis, obrázek
+           (dětská značka ze šatny) a dole bílý pruh se stavem dne. -->
+      <sc-if value="{{sk.has}}" hint-placeholder-val="{{false}}">
+      <article style="position: relative; flex-shrink: 0; zoom: 0.85; width: 232px; height: 244px; scroll-snap-align: start; border-radius: 32px; background: {{ui.tile}}; border: 1px solid {{ui.tileLine}}; box-sizing: border-box; backdrop-filter: {{ui.blur}}; -webkit-backdrop-filter: {{ui.blur}}; box-shadow: {{ui.shadow}}; overflow: hidden;">
+        <h3 style="position: absolute; top: 22px; left: 22px; margin: 0; font-size: 20px; line-height: 24px; font-weight: 400; letter-spacing: -0.02em; color: #3A3840;">Školka</h3>
+        <span aria-hidden="true" style="position: absolute; right: 26px; top: 26px; width: 92px; height: 92px; border-radius: 28px; background: #FFFFFF; box-shadow: 0 10px 24px rgba(40,40,40,0.10); transform: rotate(6deg); display: flex; align-items: center; justify-content: center;">
+          <svg width="74" height="74" viewBox="0 0 48 48"><g stroke="#17181A" stroke-width="2" stroke-linejoin="round"><circle cx="24" cy="35" r="10" fill="#FFFFFF"></circle><circle cx="24" cy="20" r="7" fill="#FFFFFF"></circle><rect x="18" y="5" width="12" height="8" rx="1.5" fill="#E0302B"></rect><rect x="15.5" y="12" width="17" height="3" rx="1.5" fill="#E0302B"></rect><path d="M24 21l5 1.5-5 1z" fill="#F28C28" stroke-width="1"></path></g><circle cx="21.5" cy="19" r="1.3" fill="#17181A"></circle><circle cx="26.5" cy="19" r="1.3" fill="#17181A"></circle><circle cx="24" cy="31" r="1.4" fill="#17181A"></circle><circle cx="24" cy="37" r="1.4" fill="#17181A"></circle></svg>
+        </span>
+        <span aria-hidden="true" style="position: absolute; left: 22px; top: 128px; height: 30px; box-sizing: border-box; padding: 0 12px; border-radius: 15px; background: #FAFAF9; box-shadow: 0 6px 16px rgba(40,40,40,0.06); transform: rotate(-3deg); display: flex; align-items: center; gap: 8px; font-size: 11px; color: #514F57;">
+          <span style="width: 8px; height: 8px; border-radius: 4px; background: #1F9D6B;"></span>{{sk.tilePill}}
+        </span>
+        <span style="position: absolute; left: 10px; right: 10px; bottom: 10px; height: 64px; box-sizing: border-box; padding: 0 18px; border-radius: 26px; background: {{sk.tileBarBg}}; box-shadow: 0 -4px 20px rgba(40,40,40,0.06); display: flex; flex-direction: column; justify-content: center;">
+          <span style="font-size: 15px; line-height: 20px; font-weight: 600; color: {{sk.tileFg}};">{{sk.tileTitle}}</span>
+          <span style="font-size: 13px; line-height: 18px; color: {{sk.tileSubFg}};">{{sk.tileSub}}</span>
+        </span>
+        <button onClick="{{sk.openLayer}}" aria-haspopup="dialog" aria-label="{{sk.tileAria}}" style="position: absolute; inset: 0; z-index: 3; border: 0; padding: 0; border-radius: 32px; background: transparent; cursor: pointer;"></button>
+      </article>
+      </sc-if>
 
       <!-- Časová osa. Zůstal nadpis a obrázek; kulaté „+“ ani spodní pruh
            už nejsou, takže odkaz nese celá dlaždice — leží přes ni jako
@@ -980,6 +1017,22 @@ button:focus-visible,a:focus-visible{outline:2px solid #17161A;outline-offset:2p
         <button onClick="{{notif.markAll}}" style="height: 32px; padding: 0 10px; border: 0; border-radius: 16px; background: transparent; font: inherit; font-size: 13px; font-weight: 600; color: #514F57; cursor: pointer;">Označit vše jako přečtené</button>
       </div>
       <sc-for list="{{notif.items}}" as="n" hint-placeholder-count="3">
+        <sc-if value="{{n.isSkolka}}" hint-placeholder-val="{{false}}">
+        <button onClick="{{n.open}}" style="width: 100%; min-height: 64px; margin-top: 6px; padding: 10px 12px 10px 10px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; border-radius: 20px; background: #FFF4E6; border: 1px solid #FBD3A6; font: inherit; text-align: left; color: #17161A; cursor: pointer;">
+          <span aria-hidden="true" style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 12px; background: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+            <svg width="30" height="30" viewBox="0 0 48 48"><g stroke="#17181A" stroke-width="2" stroke-linejoin="round"><circle cx="24" cy="35" r="10" fill="#FFFFFF"></circle><circle cx="24" cy="20" r="7" fill="#FFFFFF"></circle><rect x="18" y="5" width="12" height="8" rx="1.5" fill="#E0302B"></rect><rect x="15.5" y="12" width="17" height="3" rx="1.5" fill="#E0302B"></rect><path d="M24 21l5 1.5-5 1z" fill="#F28C28" stroke-width="1"></path></g><circle cx="21.5" cy="19" r="1.3" fill="#17181A"></circle><circle cx="26.5" cy="19" r="1.3" fill="#17181A"></circle><circle cx="24" cy="31" r="1.4" fill="#17181A"></circle><circle cx="24" cy="37" r="1.4" fill="#17181A"></circle></svg>
+          </span>
+          <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column;">
+            <span style="display: flex; align-items: baseline; gap: 8px;">
+              <span style="flex-grow: 1; min-width: 0; font-size: 14px; line-height: 20px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{n.title}}</span>
+              <span style="flex-shrink: 0; font-size: 12px; line-height: 16px; color: #6B4A1E;">{{n.time}}</span>
+            </span>
+            <span style="font-size: 13px; line-height: 18px; color: #6B4A1E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{n.sub}}</span>
+          </span>
+          <span aria-hidden="true" style="flex-shrink: 0; width: 8px; height: 8px; border-radius: 4px; background: {{n.dot}};"></span>
+        </button>
+        </sc-if>
+        <sc-if value="{{n.isLink}}" hint-placeholder-val="{{true}}">
         <a href="Mix.dc.html" style="min-height: 64px; margin-top: 6px; padding: 10px 12px 10px 10px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; border-radius: 20px; background: {{n.bg}}; border: 1px solid #EEEEEC;">
           <span style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 12px; background: {{n.avatarBg}}; color: #3A3840; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">{{n.initials}}</span>
           <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column;">
@@ -991,14 +1044,154 @@ button:focus-visible,a:focus-visible{outline:2px solid #17161A;outline-offset:2p
           </span>
           <span aria-hidden="true" style="flex-shrink: 0; width: 8px; height: 8px; border-radius: 4px; background: {{n.dot}};"></span>
         </a>
+        </sc-if>
       </sc-for>
-      <p style="margin: 10px 0 0; padding: 0 6px; font-size: 12px; line-height: 16px; color: #514F57;">Klepnutím na upozornění přejdete na časovou osu.</p>
+      <p style="margin: 10px 0 0; padding: 0 6px; font-size: 12px; line-height: 16px; color: #514F57;">Klepnutím na upozornění přejdete na časovou osu, zprávy ze školky otevřou školku.</p>
     </div>
   </sc-if>
 
 
+  <!-- ============================================================ ŠKOLKA
+       Vrstva nad Přehledem, postavená jako „Moji lékaři“. Nahoře to, co
+       školka právě hlásí, pod tím den ve školce a dole tři věci, které
+       rodič školce posílá: omluvenku, kdo dnes vyzvedne, a co školka smí
+       o dítěti vidět. Víc tu není — zbytek dne patří na časovou osu. -->
+  <sc-if value="{{sk.open}}" hint-placeholder-val="{{false}}">
+    <button aria-label="Zavřít školku" onClick="{{sk.close}}" style="position: absolute; inset: 0; z-index: 26; border: 0; padding: 0; background: rgba(245,245,244,0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); cursor: default; animation: pxFade 220ms ease;"></button>
+    <div role="dialog" aria-label="Školka" class="sym-scroll" style="position: absolute; top: 56px; left: 16px; right: 16px; z-index: 27; max-height: 760px; overflow-y: auto; padding: 16px; box-sizing: border-box; border-radius: 34px; background: #FAF9F8; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 28px 64px rgba(40,38,48,0.16); animation: pxPop 320ms cubic-bezier(0.2, 0.8, 0.2, 1);">
+
+      <div style="display: flex; align-items: center; gap: 10px; padding: 2px 2px 0 2px;">
+        <sc-if value="{{sk.isSub}}" hint-placeholder-val="{{false}}">
+          <button onClick="{{sk.back}}" aria-label="Zpět do školky" style="flex-shrink: 0; width: 44px; height: 44px; border: 1px solid rgba(23,22,26,0.06); border-radius: 22px; background: rgba(255,255,255,0.75); color: #17161A; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+          </button>
+        </sc-if>
+        <sc-if value="{{sk.isRoot}}" hint-placeholder-val="{{true}}">
+          <span aria-hidden="true" style="flex-shrink: 0; width: 46px; height: 46px; border-radius: 16px; background: #FFFFFF; border: 1px solid rgba(23,22,26,0.06); display: flex; align-items: center; justify-content: center;">
+            <svg width="38" height="38" viewBox="0 0 48 48"><g stroke="#17181A" stroke-width="2" stroke-linejoin="round"><circle cx="24" cy="35" r="10" fill="#FFFFFF"></circle><circle cx="24" cy="20" r="7" fill="#FFFFFF"></circle><rect x="18" y="5" width="12" height="8" rx="1.5" fill="#E0302B"></rect><rect x="15.5" y="12" width="17" height="3" rx="1.5" fill="#E0302B"></rect><path d="M24 21l5 1.5-5 1z" fill="#F28C28" stroke-width="1"></path></g><circle cx="21.5" cy="19" r="1.3" fill="#17181A"></circle><circle cx="26.5" cy="19" r="1.3" fill="#17181A"></circle><circle cx="24" cy="31" r="1.4" fill="#17181A"></circle><circle cx="24" cy="37" r="1.4" fill="#17181A"></circle></svg>
+          </span>
+        </sc-if>
+        <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column;">
+          <span style="font-size: 20px; line-height: 26px; font-weight: 600; letter-spacing: -0.02em;">{{sk.title}}</span>
+          <span style="font-size: 13px; line-height: 18px; color: #514F57;">{{sk.sub}}</span>
+        </span>
+        <button onClick="{{sk.close}}" aria-label="Zavřít" style="flex-shrink: 0; width: 44px; height: 44px; border: 1px solid rgba(23,22,26,0.06); border-radius: 22px; background: rgba(255,255,255,0.75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); color: #17161A; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+        </button>
+      </div>
+
+      <!-- ---------------------------------------------------- hlavní -->
+      <sc-if value="{{sk.isRoot}}" hint-placeholder-val="{{true}}">
+
+        <sc-if value="{{sk.hasAlert}}" hint-placeholder-val="{{true}}">
+          <article style="margin-top: 14px; padding: 16px; border-radius: 26px; background: #FFF1E0; border: 1px solid #FBD3A6;">
+            <div style="font-size: 11px; line-height: 15px; font-weight: 600; color: #7A4300; text-transform: uppercase; letter-spacing: 0.08em;">{{sk.alert.kicker}}</div>
+            <div style="margin-top: 6px; font-size: 34px; line-height: 40px; font-weight: 600; letter-spacing: -0.03em; color: #17161A;">{{sk.alert.value}}</div>
+            <p style="margin: 6px 0 0; font-size: 14px; line-height: 20px; color: #45434A;">{{sk.alert.text}}</p>
+            <p style="margin: 6px 0 0; font-size: 14px; line-height: 20px; font-weight: 600; color: #7A4300;">{{sk.alert.ask}}</p>
+            <button onClick="{{sk.jedu}}" style="margin-top: 14px; width: 100%; min-height: 52px; border: 0; border-radius: 26px; background: #17161A; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;">Přijedu pro něj</button>
+            <div style="margin-top: 8px; display: flex; gap: 8px;">
+              <button onClick="{{sk.call}}" style="flex: 1 1 0; min-height: 48px; border: 1px solid rgba(20,91,69,0.16); border-radius: 24px; background: #E0F5EC; color: #145B45; font: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg>
+                Zavolat
+              </button>
+              <button onClick="{{sk.write}}" style="flex: 1 1 0; min-height: 48px; border: 1px solid rgba(23,22,26,0.06); border-radius: 24px; background: #FFFFFF; color: #17161A; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">Napsat školce</button>
+            </div>
+          </article>
+        </sc-if>
+
+        <sc-if value="{{sk.isComing}}" hint-placeholder-val="{{false}}">
+          <article style="margin-top: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-radius: 24px; background: #E0F5EC; border: 1px solid rgba(20,91,69,0.14);">
+            <span aria-hidden="true" style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 18px; background: #FFFFFF; color: #145B45; display: flex; align-items: center; justify-content: center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 5 5L19 7"></path></svg>
+            </span>
+            <span style="display: flex; flex-direction: column;">
+              <span style="font-size: 15px; line-height: 20px; font-weight: 600; color: #145B45;">{{sk.comingTitle}}</span>
+              <span style="font-size: 13px; line-height: 18px; color: #2C6A55;">{{sk.comingSub}}</span>
+            </span>
+          </article>
+        </sc-if>
+
+        <div style="margin: 18px 6px 0; font-size: 11px; line-height: 15px; font-weight: 600; color: #514F57; text-transform: uppercase; letter-spacing: 0.08em;">Dnes ve školce</div>
+        <article style="margin-top: 8px; padding: 4px 14px; background: rgba(255,255,255,0.86); border: 1px solid rgba(255,255,255,0.9); border-radius: 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 24px rgba(40,38,48,0.06), 0 1px 2px rgba(40,38,48,0.04);">
+          <sc-for list="{{sk.dnes}}" as="d" hint-placeholder-count="3">
+            <div style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-top: 1px solid {{d.divider}};">
+              <span style="flex-shrink: 0; width: 40px; font-size: 13px; line-height: 20px; font-weight: 600; color: #17161A;">{{d.t}}</span>
+              <span aria-hidden="true" style="flex-shrink: 0; margin-top: 6px; width: 8px; height: 8px; border-radius: 4px; background: {{d.color}};"></span>
+              <span style="min-width: 0; display: flex; flex-direction: column;">
+                <span style="font-size: 14px; line-height: 20px; font-weight: 600; color: #17161A;">{{d.title}}</span>
+                <span style="font-size: 13px; line-height: 18px; color: #514F57;">{{d.sub}}</span>
+              </span>
+            </div>
+          </sc-for>
+        </article>
+
+        <div style="margin: 18px 6px 0; font-size: 11px; line-height: 15px; font-weight: 600; color: #514F57; text-transform: uppercase; letter-spacing: 0.08em;">Pro školku</div>
+        <sc-for list="{{sk.rows}}" as="r" hint-placeholder-count="3">
+          <button onClick="{{r.open}}" style="margin-top: 8px; width: 100%; min-height: 60px; padding: 0 14px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(23,22,26,0.06); border-radius: 24px; background: rgba(255,255,255,0.6); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); font: inherit; text-align: left; cursor: pointer;">
+            <span aria-hidden="true" style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 12px; background: {{r.tint}}; color: {{r.fg}}; display: flex; align-items: center; justify-content: center;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{r.icon}}"></path></svg>
+            </span>
+            <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column;">
+              <span style="font-size: 14px; line-height: 20px; font-weight: 600; color: #17161A;">{{r.title}}</span>
+              <span style="font-size: 12px; line-height: 16px; color: #514F57;">{{r.sub}}</span>
+            </span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F6C75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="m9 6 6 6-6 6"></path></svg>
+          </button>
+        </sc-for>
+      </sc-if>
+
+      <!-- ---------------------------------------------- omluvit / vyzvednutí
+           Dvě otázky, každá jedním klepnutím. Žádné pole na psaní — co
+           školka potřebuje vědět, se vejde do odrážek. -->
+      <sc-if value="{{sk.isForm}}" hint-placeholder-val="{{false}}">
+        <sc-for list="{{sk.form.groups}}" as="g" hint-placeholder-count="2">
+          <div style="margin: 16px 6px 0; font-size: 11px; line-height: 15px; font-weight: 600; color: #514F57; text-transform: uppercase; letter-spacing: 0.08em;">{{g.label}}</div>
+          <div style="margin: 8px 3px 0; display: flex; flex-wrap: wrap; gap: 6px;">
+            <sc-for list="{{g.chips}}" as="c" hint-placeholder-count="3">
+              <button onClick="{{c.pick}}" role="radio" aria-checked="{{c.selected}}" style="min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid {{c.border}}; background: {{c.bg}}; color: {{c.fg}}; display: flex; align-items: center; gap: 6px; font: inherit; font-size: 13px; cursor: pointer;">
+                <sc-if value="{{c.selected}}" hint-placeholder-val="{{false}}">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 5 5L19 7"></path></svg>
+                </sc-if>
+                {{c.label}}
+              </button>
+            </sc-for>
+          </div>
+        </sc-for>
+        <p style="margin: 14px 6px 0; font-size: 12px; line-height: 17px; color: #514F57;">{{sk.form.note}}</p>
+        <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #EEEEEC;">
+          <div aria-live="polite" style="padding: 0 4px 10px; font-size: 13px; line-height: 18px; color: {{sk.form.souhrnFg}};"><span style="color: #514F57;">{{sk.form.souhrnLabel}}</span>{{sk.form.souhrn}}</div>
+          <div style="display: flex; gap: 8px;">
+            <button onClick="{{sk.back}}" style="flex-grow: 1; min-height: 52px; border: 1px solid #EEEEEC; border-radius: 26px; background: #F7F7F6; color: #17161A; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">Zrušit</button>
+            <button onClick="{{sk.form.send}}" aria-disabled="{{sk.form.cantSend}}" style="flex-grow: 2; min-height: 52px; border: 0; border-radius: 26px; background: {{sk.form.sendBg}}; color: {{sk.form.sendFg}}; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">{{sk.form.sendLabel}}</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ---------------------------------------------- co školka vidí -->
+      <sc-if value="{{sk.isShare}}" hint-placeholder-val="{{false}}">
+        <div style="margin-top: 14px; padding: 4px 14px; border-radius: 24px; background: rgba(255,255,255,0.86); border: 1px solid rgba(255,255,255,0.9); box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 24px rgba(40,38,48,0.06);">
+          <sc-for list="{{sk.share}}" as="x" hint-placeholder-count="5">
+            <button onClick="{{x.toggle}}" role="switch" aria-checked="{{x.on}}" style="width: 100%; padding: 12px 0; border: 0; border-top: 1px solid {{x.divider}}; background: transparent; display: flex; align-items: center; gap: 12px; font: inherit; text-align: left; cursor: pointer;">
+              <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column;">
+                <span style="font-size: 15px; line-height: 20px; font-weight: 600; color: #17161A;">{{x.label}}</span>
+                <span style="font-size: 12px; line-height: 16px; color: #514F57;">{{x.sub}}</span>
+              </span>
+              <span aria-hidden="true" style="flex-shrink: 0; width: 50px; height: 30px; border-radius: 15px; padding: 3px; box-sizing: border-box; background: {{x.trackBg}}; display: flex; justify-content: {{x.justify}}; transition: background 220ms ease;">
+                <span style="width: 24px; height: 24px; border-radius: 12px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(40,38,48,0.22);"></span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+        <div role="note" style="margin-top: 12px; padding: 12px 14px; border-radius: 18px; background: rgba(59,111,224,0.07); border: 1px solid rgba(59,111,224,0.16); font-size: 12px; line-height: 17px; color: #27407A;">
+          Školka vidí jen to, co je tu zapnuté. Lékařské zprávy a zbytek karty zůstávají jen u vás. Změna platí hned.
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
   <sc-if value="{{toast.show}}" hint-placeholder-val="{{false}}">
-    <div style="position: absolute; left: 0; right: 0; bottom: 104px; z-index: 25; display: flex; justify-content: center; pointer-events: none;"><div role="status" style="padding: 10px 16px; border-radius: 20px; background: #17161A; color: #FFFFFF; font-size: 14px; line-height: 20px; font-weight: 600; white-space: nowrap; box-shadow: 0 12px 28px rgba(0,0,0,0.2); animation: pxPop 260ms cubic-bezier(0.2, 0.8, 0.2, 1);">{{toast.text}}</div></div>
+    <div style="position: absolute; left: 0; right: 0; bottom: 104px; z-index: 30; display: flex; justify-content: center; pointer-events: none;"><div role="status" style="padding: 10px 16px; border-radius: 20px; background: #17161A; color: #FFFFFF; font-size: 14px; line-height: 20px; font-weight: 600; white-space: nowrap; box-shadow: 0 12px 28px rgba(0,0,0,0.2); animation: pxPop 260ms cubic-bezier(0.2, 0.8, 0.2, 1);">{{toast.text}}</div></div>
   </sc-if>
 </div>
 </x-dc>
@@ -1157,7 +1350,7 @@ class Component extends DCLogic {
           { type: "med", title: "Ibalgin 400 mg", sub: "včera · lék" },
           { type: "doc", title: "Výpis z očkování", sub: "pondělí · dokument" }
         ] },
-      { key: "matheo", chip: "Matheo", name: "Matheo", gen: "Mathea", ring: 280, meta: "Syn · 8 let · č. pojištěnce 180305/2207",
+      { key: "matheo", chip: "Matheo", name: "Matheo", gen: "Mathea", age: 8, ring: 280, meta: "Syn · 8 let · č. pojištěnce 180305/2207",
         stats: [24, 6, 2],
         upcoming: [
           { date: "2026-09-29", title: "Kontrola u pediatra", sub: "9:30 · MUDr. Nováková" },
@@ -1169,19 +1362,21 @@ class Component extends DCLogic {
           { type: "result", title: "CRP 12 mg/l", sub: "dnes 14:00 · výsledek" },
           { type: "visit", title: "Kontrola u pediatra", sub: "dnes 10:15 · návštěva" }
         ] },
-      { key: "oliver", chip: "Oliver", name: "Oliver", gen: "Olivera", ring: 180, needsProof: true, meta: "Syn · 4 roky · č. pojištěnce 220211/3903",
+      { key: "oliver", chip: "Oliver", name: "Oliver", gen: "Olivera", dat: "Oliverovi", age: 4, ring: 180, needsProof: true, meta: "Syn · 4 roky · č. pojištěnce 220211/3903",
         stats: [8, 2, 1],
         upcoming: [
           { date: "2026-11-12", title: "Zubní prohlídka", sub: "14:00 · MUDr. Šimek" },
           { approx: "02/27", title: "Prohlídka 5 let", sub: "povinná, ne termín" }
         ],
         recent: [
+          { type: "symptom", title: "Teplota 38,4 °C", sub: "dnes 10:12 · zapsala školka" },
           { type: "note", title: "Prořezává se zub", sub: "dnes · poznámka" },
           { type: "visit", title: "Preventivní prohlídka", sub: "včera · návštěva" },
           { type: "symptom", title: "Rýma", sub: "pondělí · příznak" }
         ] }
     ];
     var NOTIFS = [
+      { who: "oliver", skolka: "oliver", title: "Oliver: teplota 38,4 °C", sub: "Školka Sluníčko prosí o vyzvednutí", time: "10:12", unread: true },
       { who: "matheo", title: "Matheo: školní úraz", sub: "Škola zapsala odřené koleno, ošetřeno", time: "12 min", unread: true },
       { who: "doctor", title: "MUDr. Nováková přidala záznam", sub: "Matheo · výsledek CRP", time: "14:05", unread: true },
       { who: "oliver", title: "Oliver: chybí doklad o zastupování", sub: "Nahrajte rodný list", time: "včera" }
@@ -1317,8 +1512,12 @@ class Component extends DCLogic {
       markAll: function () { self.setState({ notifRead: true }); },
       items: NOTIFS.map(function (n) {
         var un = n.unread && !readAll;
+        // Zpráva ze školky nevede na osu, ale rovnou do školky na kartě
+        // dítěte — tam je „Přijedu pro něj“, a o to v ní jde.
         return { title: n.title, sub: n.sub, time: n.time, initials: AV[n.who].initials, avatarBg: AV[n.who].bg,
-          dot: un ? "#9B3FE0" : "transparent", bg: un ? "#FBF8FE" : "#FFFFFF" };
+          dot: un ? "#9B3FE0" : "transparent", bg: un ? "#FBF8FE" : "#FFFFFF",
+          isLink: !n.skolka, isSkolka: !!n.skolka,
+          open: function () { self.setState({ person: n.skolka, skOpen: true, skPage: "root", notifOpen: false, notifRead: true }); } };
       })
     };
     var MSGS = [
@@ -2046,7 +2245,163 @@ class Component extends DCLogic {
       }
     };
 
+    /* ------------------------------------------------------------ školka
+       Jen pro dětskou kartu od 3 do 7 let s vyplněnou školkou. Školka sem
+       posílá den (příchod, teplota, potíže, úraz) a rodič jí posílá zpátky
+       jen tři věci: omluvenku, kdo dnes vyzvedne, a co smí o dítěti vidět.
+       Data jsou ukázková, stejně jako zbytek desky. */
+    var SKOLKA = {
+      oliver: {
+        nazev: "MŠ Sluníčko", trida: "třída Sluníčka", znacka: "sněhulák", ucitelka: "uč. Petra H.",
+        prichod: "8:05",
+        poverene: ["Roman", "Babička Věra", "Děda Karel"],
+        alert: { kicker: "Teplota · 10:12 · uč. Petra H.", value: "38,4 °C",
+          text: "Měřeno na čele. Je unavený, odpočívá v klidném koutku a pije čaj. Léky jsme nepodávali.",
+          ask: "Prosíme, přijeďte pro něj." },
+        dnes: [
+          { t: "10:12", type: "teplota", title: "Teplota 38,4 °C", sub: "Na čele · uč. Petra H." },
+          { t: "9:30", type: "pozn", title: "Svačina", sub: "Snědl půlku" },
+          { t: "8:05", type: "prichod", title: "Příchod", sub: "Přivedl Roman" }
+        ]
+      }
+    };
+    var SK_DOT = { prichod: "#1F9D6B", teplota: C.symptom.color, pozn: C.note.color, omluva: C.visit.color, vyzv: C.result.color, jedu: "#145B45" };
+    var hhmm = function () { var d = new Date(); return d.getHours() + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes(); };
+    var skData = SKOLKA[person.key];
+    var skHas = !!skData && person.age >= 3 && person.age <= 7;
+    var skPage = st.skPage || "root";
+    var skJedu = st.skJedu || null;
+    var skF = st.skF || {};
+    var skShare = st.skShare || { alergie: true, kontakty: true, poverene: true, ockovani: false, anamneza: false };
+    var skExtra = (st.skExtra || []).filter(function (x) { return x.osoba === person.key; });
+    var skOn = function (on) { return on ? { bg: "#FFF1E0", fg: "#7A4300", border: "#F7B56A" } : { bg: "#FFFFFF", fg: "#17161A", border: "#EEEEEC" }; };
+    var skGroup = function (label, key, list) {
+      return { label: label, chips: list.map(function (it) {
+        var on = skF[key] === it, cs = skOn(on);
+        return { label: it, selected: on, bg: cs.bg, fg: cs.fg, border: cs.border,
+          pick: function () { var o = Object.assign({}, self.state.skF || {}); o[key] = on ? null : it; self.setState({ skF: o }); } };
+      }) };
+    };
+    var skGo = function (page) { return function () { self.setState({ skPage: page, skF: {} }); }; };
+    var skAdd = function (entry, toast) {
+      entry.osoba = person.key; entry.t = hhmm();
+      self.setState({ skExtra: [entry].concat(self.state.skExtra || []), skPage: "root", skF: {} });
+      self.showToast(toast);
+    };
+
+    var sk = { has: skHas, open: !!st.skOpen && skHas };
+    if (skHas) {
+      var jm = person.name, gen = person.gen, dat = person.dat || person.name;
+      var form = null;
+      if (skPage === "omluva") {
+        var okO = skF.kdy && skF.proc;
+        form = {
+          groups: [skGroup("Kdy", "kdy", ["Dnes", "Zítra", "Dnes a zítra"]), skGroup("Proč", "proc", ["Nemoc", "Lékař", "Dovolená", "Jiné"])],
+          note: "Školka uvidí jen den a důvod, žádné podrobnosti.",
+          souhrn: okO ? jm + " nepřijde — " + skF.kdy.toLowerCase() + " · " + skF.proc.toLowerCase() : "Vyberte kdy a proč",
+          ok: okO,
+          send: function () { if (!okO) return; skAdd({ type: "omluva", title: "Omluven: " + skF.kdy.toLowerCase(), sub: skF.proc + " · odesláno školce" }, "Omluvenka odeslána do školky"); },
+          sendLabel: "Odeslat omluvenku"
+        };
+      }
+      if (skPage === "vyzv") {
+        var okV = skF.kdo && skF.kdy;
+        form = {
+          groups: [skGroup("Kdo přijde", "kdo", skData.poverene), skGroup("Kdy", "kdy", ["Po obědě", "Po spaní", "Odpoledne"])],
+          note: "Nabízíme jen osoby, které má školka jako pověřené. Další přidáte ve „Co školka vidí“.",
+          souhrn: okV ? "Dnes " + gen + " vyzvedne " + (/^Babi|^Děd/.test(skF.kdo) ? skF.kdo.charAt(0).toLowerCase() + skF.kdo.slice(1) : skF.kdo) + " · " + skF.kdy.toLowerCase() : "Vyberte kdo a kdy",
+          ok: okV,
+          send: function () { if (!okV) return; skAdd({ type: "vyzv", title: "Dnes vyzvedne: " + skF.kdo, sub: skF.kdy + " · odesláno školce" }, "Školka ví, kdo pro " + gen + " přijde"); },
+          sendLabel: "Poslat školce"
+        };
+      }
+      if (form) {
+        form.souhrnLabel = form.ok ? "Školka uvidí: " : "";
+        form.souhrnFg = form.ok ? "#17161A" : "#514F57";
+        form.cantSend = !form.ok;
+        form.sendBg = form.ok ? "#17161A" : "#F4F4F3";
+        form.sendFg = form.ok ? "#FFFFFF" : "#514F57";
+      }
+
+      var SHARE = [
+        ["alergie", "Alergie", "arašídy"],
+        ["kontakty", "Kontakty na rodiče", "Tereza, Roman"],
+        ["poverene", "Kdo smí vyzvedávat", skData.poverene.join(", ")],
+        ["ockovani", "Očkování", "jen přehled, bez dokumentů"],
+        ["anamneza", "Anamnéza", "zdravotní historie z karty"]
+      ];
+      var share = SHARE.map(function (x, i) {
+        var on = !!skShare[x[0]];
+        return { label: x[1], sub: on ? x[2] : "nesdílí se", on: on, divider: i === 0 ? "transparent" : "#EEEEEC",
+          trackBg: on ? "#145B45" : "rgba(23,22,26,0.16)", justify: on ? "flex-end" : "flex-start",
+          toggle: function () { var o = Object.assign({}, skShare); o[x[0]] = !on; self.setState({ skShare: o }); } };
+      });
+      var shareOn = SHARE.filter(function (x) { return skShare[x[0]]; }).map(function (x) { return x[1].toLowerCase(); });
+
+      var dnes = skExtra.map(function (e) { return { t: e.t, title: e.title, sub: e.sub, color: SK_DOT[e.type] }; })
+        .concat(skData.dnes.map(function (e) { return { t: e.t, title: e.title, sub: e.sub, color: SK_DOT[e.type] }; }));
+      // Nejnovější nahoře podle času, ne podle toho, odkud záznam přišel.
+      var mins = function (t) { var a = t.split(":"); return +a[0] * 60 + +a[1]; };
+      dnes.sort(function (a, b) { return mins(b.t) - mins(a.t); });
+      dnes.forEach(function (d, i) { d.divider = i === 0 ? "transparent" : "#EEEEEC"; });
+
+      var pages = { root: [skData.nazev, skData.trida + " · značka " + skData.znacka], omluva: ["Omluvit z docházky", jm + " · " + skData.nazev],
+        vyzv: ["Dnes vyzvedne někdo jiný", jm + " · " + skData.nazev], share: ["Co školka vidí", jm + " · " + skData.nazev] };
+      var hasAlert = !!skData.alert && !skJedu;
+
+      sk.title = pages[skPage][0];
+      sk.sub = pages[skPage][1];
+      sk.isRoot = skPage === "root";
+      sk.isSub = skPage !== "root";
+      sk.isForm = !!form;
+      sk.isShare = skPage === "share";
+      sk.form = form || { groups: [] };
+      sk.share = share;
+      sk.hasAlert = hasAlert;
+      sk.alert = skData.alert;
+      sk.isComing = !!skJedu;
+      sk.comingTitle = "Jedete pro " + gen;
+      sk.comingSub = "Školka to ví · potvrzeno " + skJedu;
+      sk.dnes = dnes;
+      sk.tilePill = "příchod " + skData.prichod;
+      sk.tileTitle = hasAlert ? "Teplota " + skData.alert.value : (skJedu ? "Jedete pro " + gen : "Ve školce od " + skData.prichod);
+      sk.tileSub = hasAlert ? "10:12 · prosí o vyzvednutí" : (skJedu ? "školka to ví · " + skJedu : skData.trida);
+      sk.tileBarBg = hasAlert ? "#FFF1E0" : "#FFFFFF";
+      sk.tileFg = hasAlert ? "#7A4300" : "#2E2D33";
+      sk.tileSubFg = hasAlert ? "#6B4A1E" : "#514F57";
+      sk.tileAria = "Školka — " + sk.tileTitle;
+      sk.rows = [
+        { title: "Omluvit z docházky", sub: "nemoc, lékař, dovolená", tint: "#F3E9FD", fg: "#6E24B0",
+          icon: "M7 3v3M17 3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM10 13l4 4M14 13l-4 4", open: skGo("omluva") },
+        { title: "Dnes vyzvedne někdo jiný", sub: "jen pověřené osoby", tint: "#E8EFFD", fg: "#274A9C",
+          icon: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 3.6-7 8-7s8 3 8 7", open: skGo("vyzv") },
+        { title: "Co školka o " + dat + " vidí", sub: shareOn.length ? shareOn.join(", ") : "nic nesdílíte", tint: "#E0F5EC", fg: "#145B45",
+          icon: "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", open: skGo("share") }
+      ];
+      sk.openLayer = function () { self.setState({ skOpen: true, skPage: "root", skF: {}, meOpen: false, moodOpen: false, searchOpen: false, notifOpen: false }); };
+      sk.close = function () { self.setState({ skOpen: false, skPage: "root", skF: {} }); };
+      sk.back = function () { self.setState({ skPage: "root", skF: {} }); };
+      sk.jedu = function () {
+        var t = hhmm();
+        self.setState({ skJedu: t, skExtra: [{ osoba: person.key, t: t, type: "jedu", title: "Rodič jede pro " + gen, sub: "Potvrzeno z LifeOS" }].concat(self.state.skExtra || []) });
+        self.showToast("Školka ví, že jedete");
+      };
+      sk.call = function () { self.showToast("Volám " + skData.nazev + " — v prototypu se nevolá"); };
+      sk.write = function () { self.showToast("Zpráva školce — obrazovka zatím není navržená"); };
+    }
+
+    // Banner na každé kartě, dokud rodič na prosbu školky neodpoví.
+    var skAlertKid = PEOPLE.filter(function (p) { return SKOLKA[p.key] && SKOLKA[p.key].alert && p.age >= 3 && p.age <= 7; })[0];
+    var skBanner = {
+      show: !!skAlertKid && !skJedu && !st.skOpen,
+      title: skAlertKid ? skAlertKid.name + " ve školce: " + SKOLKA[skAlertKid.key].alert.value : "",
+      sub: "Školka prosí o vyzvednutí · 10:12",
+      open: function () { self.setState({ person: skAlertKid.key, skOpen: true, skPage: "root", skF: {}, meOpen: false, moodOpen: false, searchOpen: false, notifOpen: false }); }
+    };
+
     return {
+      sk: sk,
+      skBanner: skBanner,
       ui: ui,
       cal: cal,
       sym: sym,

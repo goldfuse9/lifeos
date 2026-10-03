@@ -10,7 +10,7 @@
    v pořádku — nespadne celá.
    ============================================================================= */
 
-const VERZE = 'lifeos-v14';
+const VERZE = 'lifeos-v15';
 const SOUBORY = [
   './',
   './index.html',

@@ -46,6 +46,22 @@ aplikace nepatří.
 Sekce „Já", zprávy, nálada a vyhledávání jsou vrstvy **uvnitř Přehledu** —
 tak, jak je má plátno.
 
+### Školka (dětská karta 3–7 let)
+
+Na kartě dítěte od 3 do 7 let, které chodí do školky (v ukázce Oliver), je
+jako první dlaždice **Školka** s jeho značkou ze šatny. Otevře vrstvu, kde je:
+
+- co školka právě hlásí (teplota, potíže, úraz) a tlačítka **Přijedu pro
+  něj**, Zavolat, Napsat školce,
+- **Dnes ve školce** — příchod, svačina, zápisy učitelek,
+- **Pro školku** — omluvenka, kdo dnes vyzvedne (jen pověřené osoby)
+  a **Co školka vidí** (přepínače: alergie, kontakty, pověřené osoby,
+  očkování, anamnéza; zprávy a zbytek karty se nesdílí nikdy).
+
+Prosba školky o vyzvednutí visí jako banner na každé kartě a je i ve
+zvonečku, dokud rodič neodpoví. Protistrana pro učitelky je samostatný
+repozitář [lifeos-skolka](https://github.com/goldfuse9/lifeos-skolka).
+
 ## Jak to funguje
 
 ```
