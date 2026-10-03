@@ -1,0 +1,205 @@
+# Ruční test — fáze 1
+
+Projděte na **iOS i Androidu**. Každý řádek je buď ✅, nebo zapište, co se stalo.
+
+## A. Scénář z instrukcí (bod 17)
+
+| # | Krok | Očekávání |
+| --- | --- | --- |
+| 1 | Nainstalovat a spustit | Úvod „Zdraví celé rodiny na jednom místě“ |
+| 2 | Vytvořit účet (jméno, e-mail, heslo 2×) | Krok „Rychlé odemykání“ |
+| 3 | Zapnout Face ID / otisk | Výzva OS, pak Přehled „Ahoj, Jano“ |
+| 4 | Projít Přehled → Osa → zpět → Dokumenty → zpět → Nouzová karta → zpět → Já | Všude cesta zpět, nic nespadne |
+| 5 | Osa → Záznam: Návštěva, název, místo, poznámka, Uložit | Záznam v ose u správného času |
+| 6 | Upravit datum a čas na zítra 8:00 | Záznam z osy zmizí, je v Kalendáři a „Blíží se“; v ose se objeví zítra v 9:00 |
+| 7 | Detail → Přidat přílohu → Vyfotit; pak Vybrat soubor (PDF) | Dvě přílohy v detailu i v ose |
+| 8 | Klepnout na fotku / PDF | Fotka se zobrazí; PDF se otevře v systému |
+| 9 | Kalendář → zítřek → Naplánovat → „Odběr krve“ 7:30 | Tečka v kalendáři a v „Blíží se“; v ose až hodinu po termínu |
+| 10 | Upravit termín | Změna všude |
+| 11 | Smazat termín | Zmizí z kalendáře, osy i Přehledu |
+| 12 | Já → Vzhled → Teplé sklo; Zabezpečení → Zamknout hned | Pozadí se změní všude |
+| 13 | Zavřít aplikaci (vyhodit z přepínače) | — |
+| 14 | Otevřít | Výzva k Face ID / heslu |
+| 15 | Odemknout | Všechna data jsou zpět, pozadí teplé |
+
+## B. Odolnost
+
+| Test | Očekávání |
+| --- | --- |
+| Režim letadlo, celý scénář A | Vše funguje |
+| Restart telefonu, otevřít | Data zůstala |
+| Zámek „Po 1 min“, odejít na 30 s | Neuzamkne se |
+| Zámek „Po 1 min“, odejít na 2 min | Uzamkne se |
+| Zámek „Hned“, nahrát fotku z galerie (Android) | Během výběru se neuzamkne |
+| Přepínač aplikací | Místo obsahu jen logo |
+| 5× špatné heslo | Odpočet „Zkuste to za 30 s“ |
+| Zrušit Face ID výzvu | Zůstane přihlášení heslem |
+| Odhlásit se (Já → Odhlásit se) | Přihlašovací obrazovka, data po přihlášení zpět |
+| Změnit heslo, odhlásit, přihlásit starým / novým | Staré nejde, nové jde |
+| Vypnout biometrii, zavřít, otevřít | Jen heslo, žádná výzva OS |
+
+## C. Rodina a údaje
+
+| Test | Očekávání |
+| --- | --- |
+| Já → Přidat kartu „Ema“, dítě | Přepne se na Emu, Přehled „Karta Ema“ |
+| Záznam u Emy, pak „Zpět na moji kartu“ | Emin záznam není v mé ose |
+| Nouzové údaje: alergie, léky, „Koho volat“ s telefonem | Nouzová karta je ukazuje, „Volat kontakt“ vytáčí |
+| Lékař s telefonem | Zelené tlačítko vytáčí |
+| Odebrat kartu Emy | Zmizí i její záznamy a soubory |
+| Zápis: Trup → Bolest na hrudi | Červené varování a „Volat 155“ |
+| Já → Sledovat cyklus zapnout | V zápisu je sekce Cyklus (jen na mé kartě) |
+
+## D. Mrtvá tlačítka
+
+Klepnout na **každé** tlačítko na každé obrazovce. Nic nesmí neudělat nic.
+Položky „Připravujeme“ musí ukázat hlášku, že přijdou s online verzí.
+
+## E. Smazání všeho
+
+Já → Zabezpečení → Smazat vše → potvrdit 2× → úvodní obrazovka; nový účet
+nesmí vidět nic ze starého.
+
+## F. Cyklus
+
+| Test | Očekávání |
+| --- | --- |
+| Osobní údaje → pohlaví Žena | Na Přehledu dlaždice Cyklus „Nastavit sledování“ |
+| Cyklus → zadat začátek, délku, Začít sledovat | Kruh s počtem dní do menstruace, fáze, pás dní s DNES |
+| Zapsat → Krvácení (síla + Tento den začala), Nálada, Bolest (síla + příznaky) → Zapsat | V ose záznam „Začátek menstruace“ s Krvácení, Příznaky, Bolest, Posun |
+| Druhý den Zapsat | „Menstruace · 2. den“ |
+| Záznam v ose → Upravit | Otevře se zápis cyklu, ne obecný formulář |
+| Doplňující údaje → režim Těhotenství | Místo kruhu karta „Odhady pozastavené“, dlaždice „Těhotenství“ |
+| Upravit cyklus → Nepravidelný | Odhad jako rozmezí |
+| Upravit cyklus → Nezobrazovat na Přehledu | Dlaždice zmizí, cyklus zůstane v Já → Cyklus |
+| Přestat sledovat | Zápisy v ose zůstanou |
+
+## G. Spodní menu a nastavení
+
+| Test | Očekávání |
+| --- | --- |
+| Přehled: klepnout na zelené | Vysune se oranžová (nálada) a růžová (hledání) |
+| Nechat 5 s / klepnout jinam | Menu se sbalí, zůstane zelené |
+| Rozbalené → znovu zelené | Otevře se Já |
+| Osa, Cyklus, Dokumenty | Vpravo dole jen černé „+ Zapsat“ / „+ Nahrát“, hledání je v hlavičce |
+| Já → Osobní údaje | Stav „Chybí n údajů“, BMI z výšky a váhy |
+| Já → Doklady → Líc/Rub vyfotit | Kartička „Nahráno ✓“, fotka i v Dokumentech → Doklady |
+| Zapsat (osa, cyklus) | Klávesnice se nevysune sama, až po klepnutí do pole; žádné pole „Den“ |
+| Osa → Zapsat → „Jiný den nebo čas“ | Objeví se datum a čas pro plánování |
+| Cyklus → Historie cyklů | Řádky jen ukazují, úprava je v „Upravit cyklus“ |
+
+## H. Záloha a obnova
+
+| Test | Očekávání |
+| --- | --- |
+| Já → Záloha → heslo → Vytvořit zálohu → Uložit do Souborů | Soubor `LifeOS-zaloha-<datum>.lifeos`, v Já „Naposledy …“ |
+| Špatné heslo | „Heslo nesedí.“, nic nevznikne |
+| Smazat vše (nebo přeinstalovat) → Obnovit ze zálohy → vybrat soubor | „Záloha z …“ |
+| Špatné heslo zálohy | „Heslo nesedí, nebo je soubor poškozený.“ |
+| Správné heslo | Krok „Rychlé odemykání“, pak všechny karty, záznamy, cyklus i fotky zpět |
+| Vybrat jiný soubor (PDF) | „Tohle není záloha LifeOS.“ |
+
+## I. Připomínky
+
+| Test | Očekávání |
+| --- | --- |
+| Kalendář → zítřek → Naplánovat → „Připomenout: Hodinu předem“ | Telefon se zeptá na povolení upozornění |
+| Já → Upozornění | „Naplánováno“ ukazuje připomínku |
+| Naplánovat termín za 70 min s „Hodinu předem“, zamknout telefon | Za ~10 min upozornění „Za hodinu (…) · naplánovaný termín“ |
+| Klepnout na upozornění | Otevře se termín (po odemknutí) |
+| Upozornění → Ukázat název termínu | V textu je název |
+| Smazat termín | Připomínka zmizí z „Naplánováno“ |
+
+## J. Léky
+
+| Test | Očekávání |
+| --- | --- |
+| Přehled → Léky → Přidat lék: Euthyrox, 50 µg, Ráno 8:00 | V ose „Začátek: Euthyrox 50 µg“, na Nouzové kartě v Lécích |
+| Odškrtnout dávku | Přeškrtnuto, dlaždice „dnes vše vzato“; druhé klepnutí vrátí |
+| Upravit dávku na 75 µg | V ose „Změna: …“ |
+| Přestat brát | V ose „Konec: …“, lék v „Dříve“, zmizí z nouzové karty |
+| Připomínat zapnuto, čas za 2 min (Jiný čas) | Upozornění „… · čas na lék“; klepnutí otevře Léky |
+
+## K. Očkování
+
+| Test | Očekávání |
+| --- | --- |
+| Já → Očkování → Zapsat očkování → Tetanus, datum 2016 | Předvyplněno „Za 10 let“, v přehledu „Po termínu“, v ose „Očkování: Tetanus“ |
+| Nouzová karta | „Očkování proti tetanu: 2016“ (když není vyplněné ručně) |
+| Očkovací průkaz → vyfotit | „1 fotka · otevřít“, fotka i v Dokumentech |
+| Chřipka s přeočkováním za rok, upozornění zapnutá | V Já → Upozornění je připomínka měsíc předem |
+
+## L. Tapeta zamčené obrazovky
+
+| Test | Očekávání |
+| --- | --- |
+| Nouzová karta → Na zamčenou obrazovku | Přepínače jen u vyplněných údajů, náhled se mění |
+| Uložit obrázek → Uložit do Fotek → nastavit jako tapetu zámku | Hodiny nahoře nepřekrývají údaje |
+
+## M. Widget (iOS)
+
+| Test | Očekávání |
+| --- | --- |
+| Plocha → podržet → + → LifeOS → Rychlý zápis (střední) | Obličeje, Příznaky, Záznam |
+| Klepnout na obličej při zamčené appce | Face ID → otevře se „Jak se cítíte?“ s vybranou náladou |
+| Klepnout na Záznam | Nový záznam |
+| Zamčená obrazovka → upravit → widget LifeOS „+“ | Otevře zápis po odemknutí |
+| Widget neukazuje žádná zdravotní data | ✅ |
+
+## N. Registr léků a chytrý skener
+
+| Test | Očekávání |
+| --- | --- |
+| (po importu SÚKL) Léky → Přidat → „euthy“ | Návrhy „Euthyrox 50 µg · tableta“; výběr doplní dávku |
+| Přehled → zelené → modré (skener) → vyfotit zprávu | „Zkontrolujte“: dokument, léky, kontrola |
+| Zpráva s „Euthyrox 50 mcg 1-0-0“ | Lék Euthyrox 50 µg, ráno 8:00 |
+| „Kontrola za 3 měsíce“ | Kontrola o 3 měsíce po datu zprávy |
+| Odškrtnout lék, Uložit vybrané | V ose dokument s fotkou, v Lécích jen zaškrtnuté, kontrola v kalendáři |
+| Osa → hledat slovo z textu zprávy | Najde dokument |
+| Dokumenty → ikona skeneru v hlavičce | Otevře skener |
+
+## O. Osa — období a shrnutí potíží
+
+| Test | Očekávání |
+| --- | --- |
+| Osa → lupa → Filtr → Období: Měsíc | Nadpis „Poslední měsíc“, jen záznamy za měsíc |
+| + „Jen potíže“ | Jen příznaky, nálady, cyklus; nahoře „Potíže 2. 9. – 2. 10.“ s počty (Bolest hlavy 3× · nejčastěji ráno) |
+| Období Od–do | Dvě data, výpis mezi nimi |
+| Vymazat | Zpět celá osa |
+
+## P. Očkování (stránka)
+
+| Test | Očekávání |
+| --- | --- |
+| Přehled → dlaždice Očkování (vedle Léků) | Stránka Očkování s upozorněními nahoře |
+| Karta dítěte 2 roky, zapsané 2 dávky hexavakcíny | „Chybí povinná očkování … podmínkou přijetí do MŠ“, řádek Hexavakcína „Chybí“ |
+| 1. Povinná / 2. Nepovinná | Sbalitelné; povinná nahoře, v nich nejdřív co potřebuje pozornost |
+| Klepnout na očkování | Rozbalí se: proti čemu, kdy, podané dávky (klepnutí → záznam v ose), „Přeočkovat do“, „+ Zapsat dávku“ |
+| Fialový filtr → K řešení / Podaná / Bez záznamu | Výpis se zúží, nahoře „Filtr: … ✕“ |
+| Načíst z očkovacího průkazu → vyfotit | Seznam „vakcína + datum“ ke kontrole, uloží očkování do osy a fotku k průkazu |
+| Září–listopad | Okénko „Sezóna očkování proti chřipce“ (pokud nebyla letos) |
+| Leden–duben | Okénko „Před sezónou klíšťat“ |
+
+## Q. Prevence
+
+| Test | Očekávání |
+| --- | --- |
+| Přehled → dlaždice Prevence | Seznam prohlídek podle věku a pohlaví (doplnit v Osobních údajích) |
+| Muž 41 let | Praktik, Zubař; žena 50 let navíc Gynekolog, Mamografie, Střevo |
+| Rozkliknout → Naplánovat | Nový termín (návštěva) s datem, připomínkou; v Prevenci „Naplánováno“, v kalendáři |
+| Rozkliknout → Byl/a jsem — zapsat | Návštěva dnes v ose, v Prevenci „Naposledy … · další od …“ |
+
+## R. Srdce „K vyřešení“ a kalendář jen pro termíny
+1. Přehled vpravo nahoře: srdce místo kalendáře; růžový odznak = počet věcí k vyřešení.
+2. Srdce → seznam po oblastech (prevence, očkování, léky, nouzová karta, cyklus, záloha); klepnutí otevře příslušnou stránku. Když nic nečeká: „Všechno v pořádku“.
+3. Kalendář je v hlavičce „Blíží se“ (bílé kulaté tlačítko).
+4. Zapsat náladu / příznak / poznámku na dnes → v kalendáři ani v týdenním pásu se neobjeví (jen v Ose).
+5. Naplánovat návštěvu na jiný den → tečka v kalendáři i týdenním pásu, objeví se v „Blíží se“.
+
+## S. Školka — zpráva ze školky (ukázka)
+1. Karta dítěte 3–7 let → Školka → „Vyzkoušet ukázku“. Povolit upozornění, zamknout telefon.
+2. Do 5 s přijde upozornění „<školka> · <jméno>“: teplota 37,6 °C a odřené koleno.
+3. Klepnutí na upozornění (i přes zámek) otevře zprávu: karta teploty a úrazu s ošetřením, pod tím oběd a odpočinek, štítek „Ukázka“.
+4. Tlačítka: Beru na vědomí (změní se na „Přečteno hh:mm“), Vyzvednu dřív (SMS školce), Zavolat, Změřit doma (zápis příznaků).
+5. Dokud není potvrzeno: štítek „Nové“ ve Školce a položka v srdci „K vyřešení“. Po potvrzení zmizí.
+6. Zpráva je i v Ose; klepnutí otevře stejnou obrazovku. Přepočet připomínek ukázkové upozornění nezruší.
