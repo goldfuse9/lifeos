@@ -195,3 +195,11 @@ nesmí vidět nic ze starého.
 3. Kalendář je v hlavičce „Blíží se“ (bílé kulaté tlačítko).
 4. Zapsat náladu / příznak / poznámku na dnes → v kalendáři ani v týdenním pásu se neobjeví (jen v Ose).
 5. Naplánovat návštěvu na jiný den → tečka v kalendáři i týdenním pásu, objeví se v „Blíží se“.
+
+## S. Školka — zpráva ze školky (ukázka)
+1. Karta dítěte 3–7 let → Školka → „Vyzkoušet ukázku“. Povolit upozornění, zamknout telefon.
+2. Do 5 s přijde upozornění „<školka> · <jméno>“: teplota 37,6 °C a odřené koleno.
+3. Klepnutí na upozornění (i přes zámek) otevře zprávu: karta teploty a úrazu s ošetřením, pod tím oběd a odpočinek, štítek „Ukázka“.
+4. Tlačítka: Beru na vědomí (změní se na „Přečteno hh:mm“), Vyzvednu dřív (SMS školce), Zavolat, Změřit doma (zápis příznaků).
+5. Dokud není potvrzeno: štítek „Nové“ ve Školce a položka v srdci „K vyřešení“. Po potvrzení zmizí.
+6. Zpráva je i v Ose; klepnutí otevře stejnou obrazovku. Přepočet připomínek ukázkové upozornění nezruší.

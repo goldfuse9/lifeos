@@ -1,5 +1,5 @@
 import { WEEKDAYS_SHORT, addDays, ageOn, parseLocalDate } from './dates';
-import type { LocalDate } from './types';
+import type { LocalDate, RecordDraft } from './types';
 
 /**
  * Školka — rodičovská strana na kartě dítěte (3–7 let).
@@ -152,4 +152,87 @@ export const ZNACKY: Znacka[] = [
 
 export function znackaOf(key: string | undefined): Znacka | null {
   return ZNACKY.find((z) => z.key === key) ?? null;
+}
+
+/* ------------------------------------------------------ zprávy ze školky
+   Zápis, který učitelka udělá na tabletu (lifeos-skolka): teplota, úraz,
+   jídlo, spaní. Doručení potřebuje server (fáze 2); do té doby jde zprávu
+   vyzkoušet jako ukázku — uloží se jen v telefonu a označí se „Ukázka“. */
+
+export type ZapisKind = 'teplota' | 'uraz' | 'jidlo' | 'spanek' | 'info';
+
+export interface SkolkaZapis {
+  kind: ZapisKind;
+  /** „10:40“ */
+  time: string;
+  title: string;
+  /** Hlavní údaj — „37,6 °C“, „pravé koleno“. */
+  value?: string;
+  /** Co se stalo / jak to proběhlo. */
+  text?: string;
+  /** Jak bylo ošetřeno (u úrazu a teploty). */
+  care?: string;
+}
+
+export interface SkolkaZprava {
+  /** Kdo zapsal — „p. uč. Jana“. */
+  from: string;
+  items: SkolkaZapis[];
+  /** Rodič potvrdil přečtení (ISO). */
+  ackAt?: string;
+  demo?: boolean;
+}
+
+/** Zápisy, kvůli kterým má rodič zbystřit. */
+export const ZAPIS_ALERT: ZapisKind[] = ['teplota', 'uraz'];
+
+export function zpravaOf(r: { metadata: Record<string, unknown> }): SkolkaZprava | null {
+  if (r.metadata.skolka !== 'zprava') return null;
+  const z = r.metadata.zprava as SkolkaZprava | undefined;
+  return z && Array.isArray(z.items) ? z : null;
+}
+
+/** Krátké shrnutí do notifikace a řádku: „Teplota 37,6 °C · Úraz: odřené koleno“. */
+export function zpravaSummary(z: SkolkaZprava): string {
+  const alert = z.items.filter((i) => ZAPIS_ALERT.includes(i.kind));
+  const list = alert.length ? alert : z.items;
+  return list.map((i) => (i.value && /\d/.test(i.value) ? `${i.title} ${i.value}` : i.title)).join(' · ');
+}
+
+export function zpravaRecord(z: SkolkaZprava, date: LocalDate, time: string, place?: string): RecordDraft {
+  const alert = z.items.some((i) => ZAPIS_ALERT.includes(i.kind));
+  return {
+    type: 'note',
+    title: 'Zpráva ze školky',
+    description: zpravaSummary(z),
+    date,
+    time,
+    metadata: {
+      skolka: 'zprava',
+      zprava: z,
+      place,
+      badge: alert ? 'Ze školky' : undefined,
+      badgeTone: alert ? 'warn' : undefined,
+      // Pro obecný detail záznamu a hledání v ose
+      children: z.items.map((i) => ({ label: `${i.time} ${i.title}`, value: [i.value, i.text, i.care ? 'Ošetření: ' + i.care : null].filter(Boolean).join(' — '), type: i.kind === 'teplota' || i.kind === 'uraz' ? ('symptom' as const) : ('note' as const) })),
+    },
+  };
+}
+
+/** Ukázková zpráva — denní zápis s teplotou a odřeným kolenem. Bez rodu, ať sedí holce i klukovi. */
+export function demoZprava(): SkolkaZprava {
+  return {
+    from: 'p. uč. Jana',
+    demo: true,
+    items: [
+      { kind: 'teplota', time: '10:40', title: 'Zvýšená teplota', value: '37,6 °C', text: 'Po svačině únava a teplé čelo, měřeno teploměrem v uchu.', care: 'Odpočinek v herně, pití (čaj). Kontrola v 11:30: 37,1 °C.' },
+      { kind: 'uraz', time: '14:15', title: 'Odřené koleno', value: 'pravé koleno', text: 'Pád na zahradě u pískoviště, povrchová oděrka bez otoku.', care: 'Vymyto vodou, dezinfekce, náplast. Chůze bez potíží, pak hra dál.' },
+      { kind: 'jidlo', time: '11:45', title: 'Oběd', value: 'polovina', text: 'Polévka celá, hlavní jídlo napůl.' },
+      { kind: 'spanek', time: '12:30', title: 'Odpočinek', value: '12:30–14:00', text: 'Spánek klidný.' },
+    ],
+  };
+}
+
+export function vyzvDrivText(p: { child: string; parent: string | null }): string {
+  return `Dobrý den, děkuji za zprávu. ${p.child} — vyzvednu dnes dřív, jak to půjde. ${podpis(p.parent)}`;
 }

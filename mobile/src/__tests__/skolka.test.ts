@@ -41,3 +41,15 @@ test('značky: 28 jedinečných, sněhulák existuje', () => {
   expect(znackaOf('snehulak')?.name).toBe('sněhulák');
   expect(znackaOf('neni')).toBeNull();
 });
+
+test('zpráva ze školky — shrnutí a záznam', () => {
+  const { demoZprava, zpravaSummary, zpravaRecord, zpravaOf, vyzvDrivText } = jest.requireActual('@/domain/skolka') as typeof import('@/domain/skolka');
+  const z = demoZprava();
+  expect(zpravaSummary(z)).toBe('Zvýšená teplota 37,6 °C · Odřené koleno');
+  const r = zpravaRecord(z, '2026-10-03', '14:20', 'MŠ Sluníčko');
+  expect(r.metadata!.badge).toBe('Ze školky');
+  expect(r.metadata!.children).toHaveLength(4);
+  expect(zpravaOf({ metadata: r.metadata! })?.items[1].kind).toBe('uraz');
+  expect(zpravaOf({ metadata: { skolka: 'omluvenka' } })).toBeNull();
+  expect(vyzvDrivText({ child: 'Oliver', parent: 'Roman' })).toContain('Oliver — vyzvednu dnes dřív');
+});

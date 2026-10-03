@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useData, useSession } from '@/state/session';
 import { useLoad } from '@/state/useLoad';
 import { RECORD_TYPES } from '@/domain/recordTypes';
@@ -53,6 +53,8 @@ export default function RecordDetail() {
   }
 
   const { r, files } = value;
+  // Zpráva ze školky má vlastní obrazovku (zápis učitelky a co rodič udělá)
+  if (r.metadata.skolka === 'zprava') return <Redirect href={{ pathname: '/skolka/zprava', params: { id: r.id } }} />;
   const t = RECORD_TYPES[r.type];
   const m = r.metadata || {};
   const person = persons.find((p) => p.id === r.personId);

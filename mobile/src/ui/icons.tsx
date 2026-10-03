@@ -37,6 +37,9 @@ export const IconWarn = (p: P) => <S {...p}><Path d="M12 4 2.5 20h19z" /><Path d
 export const IconBolt = (p: P) => <S {...p}><Path d="M13 3 5 13.5h6L10 21l8-10.5h-6z" /></S>;
 export const IconScan = (p: P) => <S {...p}><Path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" /><Path d="M8 10h8M8 14h5" /></S>;
 export const IconHeart = (p: P) => <S {...p}><Path d="M12 20s-7.5-4.6-9.2-9.4C1.7 7.4 3.9 4.5 7 4.5c2 0 3.3 1.1 5 3 1.7-1.9 3-3 5-3 3.1 0 5.3 2.9 4.2 6.1C19.5 15.4 12 20 12 20z" /></S>;
+export const IconThermo = (p: P) => <S {...p}><Path d="M10 14.5V5a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z" /><Path d="M12 9v7" /></S>;
+export const IconBandage = (p: P) => <S {...p}><Rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)" /><Path d="M10 12h.01M14 12h.01M12 10h.01M12 14h.01" /></S>;
+export const IconSms = (p: P) => <S {...p}><Path d="M4 5h16v11H9l-5 4z" /><Path d="M8 10.5h8" /></S>;
 export const IconFilter = (p: P) => <S {...p}><Path d="M4 6h16M7 12h10M10 18h4" /></S>;
 
 export const IconMoodFab = (p: P) => (

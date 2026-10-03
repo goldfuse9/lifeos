@@ -5,7 +5,8 @@ import { applicable, preventionOverview } from '@/domain/prevention';
 import { vaxOverview } from '@/domain/vaccineCatalog';
 import { dosesFor, medTitle } from '@/domain/meds';
 import { emergencyProgress } from '@/domain/emergency';
-import { numericDate, toLocalDate, toLocalTime } from '@/domain/dates';
+import { addDays, numericDate, toLocalDate, toLocalTime } from '@/domain/dates';
+import { zpravaOf, zpravaSummary } from '@/domain/skolka';
 
 /**
  * „K vyřešení“ — co z ostatních oddílů potřebuje pozornost. Jen věci,
@@ -30,14 +31,21 @@ export function useTodo(): { items: TodoItem[]; loading: boolean } {
   const nowT = toLocalTime(new Date(now.getTime() - 60 * 60 * 1000));
 
   const { value, loading } = useLoad(async () => {
-    const [recs, personal, emergency, meds, medlog] = await Promise.all([
+    const [recs, personal, emergency, meds, medlog, notes] = await Promise.all([
       data.records.query({ personId: person.id, types: ['vaccine', 'visit', 'event', 'result'] }),
       data.personData.get(person.id, 'personal'),
       data.personData.get(person.id, 'emergency'),
       data.personData.get(person.id, 'meds'),
       data.personData.get(person.id, 'medlog'),
+      data.records.query({ personId: person.id, types: ['note'], from: addDays(today, -1), to: today }),
     ]);
     const items: TodoItem[] = [];
+
+    // Nepřečtená zpráva ze školky (dnes, včera) — nahoru
+    for (const r of notes) {
+      const z = zpravaOf(r);
+      if (z && !z.ackAt) items.push({ key: 'skolka-' + r.id, area: 'Školka', title: 'Zpráva ze školky', sub: zpravaSummary(z), href: '/skolka/zprava?id=' + r.id, tone: 'warn' });
+    }
 
     for (const v of vaxOverview(recs.filter((r) => r.type === 'vaccine'), person.birthDate, today)) {
       if (v.state === 'due') items.push({ key: 'vax-' + v.name, area: 'Očkování', title: v.name, sub: 'Po termínu přeočkování' + (v.nextDue ? ' (od ' + numericDate(v.nextDue) + ')' : ''), href: '/ockovani', tone: 'warn' });

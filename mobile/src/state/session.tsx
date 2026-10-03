@@ -299,7 +299,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
       async wipeEverything() {
         await lock();
-        await clearReminders().catch(() => {});
+        await clearReminders(true).catch(() => {});
         await auth.wipe();
         await deleteDb();
         try {

@@ -32,6 +32,7 @@ export default function AppLayout() {
         <Stack.Screen name="leky/upravit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="skolka/index" />
         <Stack.Screen name="skolka/sdileni" />
+        <Stack.Screen name="skolka/zprava" />
         <Stack.Screen name="skolka/nastavit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="skolka/omluvit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="skolka/vyzvedne" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
@@ -52,6 +53,7 @@ export default function AppLayout() {
 function ReminderTap() {
   const open = useCallback((d: { recordId?: string; screen?: string }) => {
     if (d.screen === 'leky') router.push('/leky');
+    else if (d.screen === 'skolka-zprava' && d.recordId) router.push({ pathname: '/skolka/zprava', params: { id: d.recordId } });
     else if (d.recordId) router.push(`/zaznam/${d.recordId}`);
   }, []);
   useReminderTap(open);

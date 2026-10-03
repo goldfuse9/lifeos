@@ -25,8 +25,17 @@ export async function notificationPermission(ask: boolean): Promise<boolean> {
   return r.granted;
 }
 
+/** Zprávy ze školky se přepočtem připomínek nemažou — nejsou odvozené z databáze termínů. */
+const SCHOOL = 'skolka-';
+
+async function cancelReminderNotifications(): Promise<void> {
+  for (const n of await Notifications.getAllScheduledNotificationsAsync()) {
+    if (!n.identifier.startsWith(SCHOOL)) await Notifications.cancelScheduledNotificationAsync(n.identifier);
+  }
+}
+
 export async function applyReminders(list: PlannedReminder[]): Promise<void> {
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  await cancelReminderNotifications();
   for (const n of list) {
     await Notifications.scheduleNotificationAsync({
       identifier: n.id,
@@ -38,8 +47,19 @@ export async function applyReminders(list: PlannedReminder[]): Promise<void> {
   }
 }
 
-export async function clearReminders(): Promise<void> {
-  await Notifications.cancelAllScheduledNotificationsAsync();
+/** `all` i se zprávami ze školky (smazání všech dat). */
+export async function clearReminders(all = false): Promise<void> {
+  if (all) await Notifications.cancelAllScheduledNotificationsAsync();
+  else await cancelReminderNotifications();
+}
+
+/** Zpráva ze školky jako místní upozornění (zatím ukázka, se serverem přijde push). */
+export async function notifySchool(p: { recordId: string; title: string; body: string; inSeconds: number }): Promise<void> {
+  await Notifications.scheduleNotificationAsync({
+    identifier: SCHOOL + p.recordId,
+    content: { title: p.title, body: p.body, data: { screen: 'skolka-zprava', recordId: p.recordId }, sound: true },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: p.inSeconds, channelId: CHANNEL },
+  });
 }
 
 export async function scheduledReminders(): Promise<{ at: Date | null; body: string }[]> {
@@ -57,6 +77,7 @@ export async function scheduledReminders(): Promise<{ at: Date | null; body: str
       }
       return { at: raw != null ? new Date(raw) : null, body: n.content.body ?? '' };
     })
+    .filter((_, i) => !all[i].identifier.startsWith(SCHOOL))
     .sort((a, b) => (a.at?.getTime() ?? 0) - (b.at?.getTime() ?? 0));
 }
 
