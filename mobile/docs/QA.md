@@ -203,3 +203,13 @@ nesmí vidět nic ze starého.
 4. Tlačítka: Beru na vědomí (změní se na „Přečteno hh:mm“), Vyzvednu dřív (SMS školce), Zavolat, Změřit doma (zápis příznaků).
 5. Dokud není potvrzeno: štítek „Nové“ ve Školce a položka v srdci „K vyřešení“. Po potvrzení zmizí.
 6. Zpráva je i v Ose; klepnutí otevře stejnou obrazovku. Přepočet připomínek ukázkové upozornění nezruší.
+
+## T. Školka — nová karta (dlaždice)
+1. Školka: Dnes · dlaždice Omluvit, Zprávy, Platby, Akce, Docházka, Fotky · řádky Vyzvedne jiný, Dotazníky · Nastavení školky.
+2. Bez ukázky: dlaždice „zatím nic“, dole odkaz „Vyzkoušet ukázku“. Po ukázce štítek „Ukázka“, za 5 s upozornění se zprávou.
+3. Akce: Drakiáda a Fotografování rovnou v kalendáři; ZOO → dotazník. „Ano, pojede“ zapíše ZOO do kalendáře a 250 Kč do plateb, „Nepojede“ termín i platbu zruší.
+4. Platby: bez účtu výzva k doplnění; Nastavení → účet (např. 19-2000145399/0800) a VS → QR kód, banka ho přečte. Neplatné číslo účtu formulář nepustí. „Už jsem zaplatil(a)“ přesune do Zaplaceno.
+5. Docházka: měsíc s šipkami; omluvenka (skutečná) obarví den fialově a zvýší počet omluvených.
+6. Fotky: otevřením zmizí odznak nových.
+7. Srdce: nezaplacená platba a nezodpovězený dotazník.
+8. Nastavení školky → Odebrat ukázku: zmizí ukázková data, zpráva i termíny z kalendáře.

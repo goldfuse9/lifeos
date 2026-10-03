@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useData, usePerson, useSession } from '@/state/session';
 import { useLoad } from '@/state/useLoad';
 import { ZNACKY, type SkolkaData } from '@/domain/skolka';
+import { czIban } from '@/domain/skolkaFeed';
 import { Backdrop, Card, Field, H1, Loading, PrimaryButton, T, TopBar, haptic, useToast } from '@/ui/kit';
 import { Znacka } from '@/ui/Znacka';
 import { C } from '@/ui/theme';
@@ -41,6 +42,8 @@ function Form({ initial }: { initial: SkolkaData }) {
   const [trida, setTrida] = useState(initial.trida ?? '');
   const [phone, setPhone] = useState(initial.phone ?? '');
   const [znacka, setZnacka] = useState(initial.znacka ?? '');
+  const [ucet, setUcet] = useState(initial.ucet ?? '');
+  const [vs, setVs] = useState(initial.vs ?? '');
   const [people, setPeople] = useState<string[]>(initial.poverene ?? []);
   const [newPerson, setNewPerson] = useState('');
   const [tried, setTried] = useState(false);
@@ -56,10 +59,12 @@ function Form({ initial }: { initial: SkolkaData }) {
   const save = async () => {
     setTried(true);
     if (!name.trim()) return;
+    if (ucet.trim() && !czIban(ucet)) return;
+    if (vs.trim() && !/^\d{1,10}$/.test(vs.trim())) return;
     setBusy(true);
     try {
       const extra = newPerson.trim() && !people.includes(newPerson.trim()) ? [newPerson.trim()] : [];
-      await data.personData.set(person.id, 'skolka', { ...initial, name, trida, phone, znacka: znacka || undefined, poverene: [...people, ...extra] });
+      await data.personData.set(person.id, 'skolka', { ...initial, name, trida, phone, znacka: znacka || undefined, poverene: [...people, ...extra], ucet: ucet.trim() || undefined, vs: vs.trim() || undefined });
       touch();
       toast('Školka uložena');
       router.back();
@@ -119,6 +124,12 @@ function Form({ initial }: { initial: SkolkaData }) {
               <T w="semibold" style={{ fontSize: 14 }}>+ Přidat</T>
             </Pressable>
           ) : null}
+        </Card>
+
+        <T w="semibold" style={{ marginTop: 20, paddingLeft: 4, fontSize: 13, color: C.muted }}>Platby (nepovinné)</T>
+        <Card style={{ marginTop: 8, padding: 16, gap: 14 }}>
+          <Field label="Účet školky na stravné" value={ucet} onChangeText={setUcet} placeholder="Např. 123456789/0800" keyboardType="numbers-and-punctuation" maxLength={24} hint="Z přihlášky ke stravování — pro QR platbu" error={tried && ucet.trim() && !czIban(ucet) ? 'Číslo účtu nesedí — zkontrolujte ho.' : null} />
+          <Field label="Variabilní symbol" value={vs} onChangeText={setVs} placeholder="VS dítěte" keyboardType="number-pad" maxLength={10} error={tried && vs.trim() && !/^\d{1,10}$/.test(vs.trim()) ? 'Jen číslice.' : null} />
         </Card>
 
         <PrimaryButton style={{ marginTop: 24 }} label="Uložit" onPress={save} busy={busy} />

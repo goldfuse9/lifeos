@@ -33,6 +33,13 @@ export default function AppLayout() {
         <Stack.Screen name="skolka/index" />
         <Stack.Screen name="skolka/sdileni" />
         <Stack.Screen name="skolka/zprava" />
+        <Stack.Screen name="skolka/zpravy" />
+        <Stack.Screen name="skolka/platby" />
+        <Stack.Screen name="skolka/akce" />
+        <Stack.Screen name="skolka/dochazka" />
+        <Stack.Screen name="skolka/fotky" />
+        <Stack.Screen name="skolka/dotazniky" />
+        <Stack.Screen name="skolka/nastaveni" />
         <Stack.Screen name="skolka/nastavit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="skolka/omluvit" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="skolka/vyzvedne" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />

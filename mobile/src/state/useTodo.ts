@@ -7,6 +7,7 @@ import { dosesFor, medTitle } from '@/domain/meds';
 import { emergencyProgress } from '@/domain/emergency';
 import { addDays, numericDate, toLocalDate, toLocalTime } from '@/domain/dates';
 import { zpravaOf, zpravaSummary } from '@/domain/skolka';
+import { czk, openSurveys, unpaid } from '@/domain/skolkaFeed';
 
 /**
  * „K vyřešení“ — co z ostatních oddílů potřebuje pozornost. Jen věci,
@@ -31,13 +32,14 @@ export function useTodo(): { items: TodoItem[]; loading: boolean } {
   const nowT = toLocalTime(new Date(now.getTime() - 60 * 60 * 1000));
 
   const { value, loading } = useLoad(async () => {
-    const [recs, personal, emergency, meds, medlog, notes] = await Promise.all([
+    const [recs, personal, emergency, meds, medlog, notes, feed] = await Promise.all([
       data.records.query({ personId: person.id, types: ['vaccine', 'visit', 'event', 'result'] }),
       data.personData.get(person.id, 'personal'),
       data.personData.get(person.id, 'emergency'),
       data.personData.get(person.id, 'meds'),
       data.personData.get(person.id, 'medlog'),
       data.records.query({ personId: person.id, types: ['note'], from: addDays(today, -1), to: today }),
+      data.personData.get(person.id, 'skolkafeed'),
     ]);
     const items: TodoItem[] = [];
 
@@ -45,6 +47,12 @@ export function useTodo(): { items: TodoItem[]; loading: boolean } {
     for (const r of notes) {
       const z = zpravaOf(r);
       if (z && !z.ackAt) items.push({ key: 'skolka-' + r.id, area: 'Školka', title: 'Zpráva ze školky', sub: zpravaSummary(z), href: '/skolka/zprava?id=' + r.id, tone: 'warn' });
+    }
+    for (const p of unpaid(feed)) {
+      items.push({ key: 'platba-' + p.id, area: 'Školka', title: p.title, sub: czk(p.amount) + ' · splatné do ' + numericDate(p.due), href: '/skolka/platby', tone: p.due <= addDays(today, 3) ? 'warn' : 'info' });
+    }
+    for (const d of openSurveys(feed)) {
+      items.push({ key: 'dotaznik-' + d.id, area: 'Školka', title: d.question, sub: 'Dotazník · odpovězte do ' + numericDate(d.due), href: '/skolka/dotazniky', tone: 'info' });
     }
 
     for (const v of vaxOverview(recs.filter((r) => r.type === 'vaccine'), person.birthDate, today)) {

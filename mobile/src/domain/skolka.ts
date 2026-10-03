@@ -30,6 +30,9 @@ export interface SkolkaData {
   /** Kdo smí dítě vyzvedávat kromě rodičů. */
   poverene?: string[];
   share?: Partial<SkolkaShare>;
+  /** Účet školky na stravné („123456789/0800“) a variabilní symbol dítěte — pro QR platbu. */
+  ucet?: string;
+  vs?: string;
 }
 
 export const SHARE_DEFAULT: SkolkaShare = { alergie: true, kontakty: true, poverene: true, ockovani: false, anamneza: false };

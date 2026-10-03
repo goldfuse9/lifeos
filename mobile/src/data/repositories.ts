@@ -20,6 +20,7 @@ import { DEFAULT_SETTINGS } from '@/domain/types';
 import type { CycleSettings } from '@/domain/cycle';
 import type { MedList, MedLog } from '@/domain/meds';
 import type { SkolkaData } from '@/domain/skolka';
+import type { SkolkaFeed } from '@/domain/skolkaFeed';
 
 /**
  * Repozitáře — jediné místo, které zná SQL. Služby a obrazovky pracují
@@ -322,8 +323,8 @@ export class AttachmentRepository {
   }
 }
 
-export type PersonSection = 'personal' | 'emergency' | 'doctors' | 'cycle' | 'docs' | 'meds' | 'medlog' | 'skolka';
-type SectionData = { personal: PersonalData; emergency: EmergencyData; doctors: DoctorList; cycle: CycleSettings; docs: DocsData; meds: MedList; medlog: MedLog; skolka: SkolkaData };
+export type PersonSection = 'personal' | 'emergency' | 'doctors' | 'cycle' | 'docs' | 'meds' | 'medlog' | 'skolka' | 'skolkafeed';
+type SectionData = { personal: PersonalData; emergency: EmergencyData; doctors: DoctorList; cycle: CycleSettings; docs: DocsData; meds: MedList; medlog: MedLog; skolka: SkolkaData; skolkafeed: SkolkaFeed };
 
 export class PersonDataRepository {
   constructor(private db: SqlDriver, private clock: Clock) {}
