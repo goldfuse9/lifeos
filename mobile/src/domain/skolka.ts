@@ -203,7 +203,9 @@ export function zpravaRecord(z: SkolkaZprava, date: LocalDate, time: string, pla
   const alert = z.items.some((i) => ZAPIS_ALERT.includes(i.kind));
   return {
     type: 'note',
-    title: 'Zpráva ze školky',
+    // Ukázka leží ve skutečné kartě dítěte — v ose a hledání musí být
+    // na první pohled vidět, že teplota a úraz nejsou opravdové.
+    title: z.demo ? 'Ukázka: zpráva ze školky' : 'Zpráva ze školky',
     description: zpravaSummary(z),
     date,
     time,

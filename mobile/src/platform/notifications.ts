@@ -53,6 +53,11 @@ export async function clearReminders(all = false): Promise<void> {
   else await cancelReminderNotifications();
 }
 
+/** Zrušit naplánované upozornění zprávy ze školky (třeba po smazání ukázky). */
+export async function cancelSchool(recordId: string): Promise<void> {
+  await Notifications.cancelScheduledNotificationAsync(SCHOOL + recordId);
+}
+
 /** Zpráva ze školky jako místní upozornění (zatím ukázka, se serverem přijde push). */
 export async function notifySchool(p: { recordId: string; title: string; body: string; inSeconds: number }): Promise<void> {
   await Notifications.scheduleNotificationAsync({
