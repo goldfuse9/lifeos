@@ -19,6 +19,8 @@ import { Wordmark } from '@/ui/Wordmark';
 import { C } from '@/ui/theme';
 import { IconCalendar, IconClose, IconHeart, IconPlus, IconShield } from '@/ui/icons';
 import { useTodo } from '@/state/useTodo';
+import { isSet, showSkolka } from '@/domain/skolka';
+import { Znacka } from '@/ui/Znacka';
 import type { HcRecord } from '@/domain/types';
 
 /**
@@ -61,6 +63,8 @@ export default function Prehled() {
     const prevNow = prevList.filter((p) => p.state === 'now');
     const prevPlanned = prevList.find((p) => p.state === 'planned')?.planned ?? null;
     const doses = dosesFor(meds.list ?? [], medlog, today);
+    const sk = await data.personData.get(person.id, 'skolka');
+    const skToday = showSkolka(person.birthDate, sk, today) ? past.filter((r) => r.date === today && !!r.metadata.skolka) : [];
     return {
       upcoming: future.filter((r) => isPlanned(r) && isUpcoming(r, today, nowTime)).slice(0, 8),
       recent: past.filter((r) => !isUpcoming(r, today, nowTime) && !isPending(r, new Date())).slice(0, 6),
@@ -71,6 +75,7 @@ export default function Prehled() {
       medsTotal: doses.length,
       vax: { todo: vaxTodo.length, first: vaxTodo[0]?.name ?? null, given: vaxRecs.length },
       prev: { now: prevNow.length, first: prevNow[0]?.def.name ?? null, planned: prevPlanned ? prevPlanned.date : null },
+      skolka: showSkolka(person.birthDate, sk, today) ? { set: isSet(sk), znacka: sk.znacka, name: sk.name ?? null, today: skToday[0]?.title ?? null } : null,
     };
   }, [person.id, today, nowTime, weekStart, person.birthDate]);
 
@@ -130,6 +135,8 @@ export default function Prehled() {
 
         {/* Dlaždice — vodorovný pás jako na desce (zoom 0,85 → 197 × 207) */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} snapToInterval={207} decelerationRate="fast" style={{ marginTop: 12, marginHorizontal: -16 }} contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 4, gap: 10 }}>
+          {/* Školka jde dítěti 3–7 let první — ve všední den je to to, co rodič chce vědět */}
+          {value?.skolka ? <TileSkolka info={value.skolka} onPress={() => router.push(value.skolka!.set ? '/skolka' : '/skolka/nastavit')} /> : null}
           <TileTimeline onPress={() => router.push('/osa')} />
           {showCycle ? <TileCycle info={cycle.settings.enabled && cycle.settings.mode !== 'těhotenství' ? cycle.info : null} pregnant={cycle.settings.enabled && cycle.settings.mode === 'těhotenství'} onPress={() => router.push('/cyklus')} /> : null}
           <TileMeds left={value?.medsLeft ?? null} total={value?.medsTotal ?? 0} count={value?.medsCount ?? 0} onPress={() => router.push('/leky')} />
@@ -438,6 +445,24 @@ function TileCycle({ info, pregnant, onPress }: { info: CycleInfo | null; pregna
       </View>
       <View style={{ position: 'absolute', left: 8, right: 8, bottom: 8, height: 40, paddingHorizontal: 12, borderRadius: 18, backgroundColor: C.white, justifyContent: 'center' }}>
         <T w="semibold" numberOfLines={1} style={{ fontSize: 12, lineHeight: 16, color: C.ink2 }}>{sub}</T>
+      </View>
+    </TileShell>
+  );
+}
+
+function TileSkolka({ info, onPress }: { info: { set: boolean; znacka?: string; name: string | null; today: string | null }; onPress: () => void }) {
+  const sub = !info.set ? 'Nastavit školku' : info.today ?? info.name ?? 'Školka';
+  return (
+    <TileShell title="Školka" label={'Školka, ' + sub} onPress={onPress}>
+      <View style={{ position: 'absolute', right: 20, top: 22, width: 80, height: 80, borderRadius: 24, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 10px 24px rgba(40,40,40,0.10)', transform: [{ rotate: '6deg' }] }}>
+        <Znacka value={info.znacka} size={62} />
+      </View>
+      <View style={{ position: 'absolute', left: 19, top: 112, height: 26, paddingHorizontal: 10, borderRadius: 13, backgroundColor: '#FAFAF9', boxShadow: '0px 6px 16px rgba(40,40,40,0.06)', transform: [{ rotate: '-3deg' }], flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+        <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: info.today ? '#3B6FE0' : C.okDot }} />
+        {bar(44)}
+      </View>
+      <View style={{ position: 'absolute', left: 8, right: 8, bottom: 8, height: 40, paddingHorizontal: 12, borderRadius: 18, backgroundColor: C.white, justifyContent: 'center' }}>
+        <T w="semibold" numberOfLines={1} style={{ fontSize: 12, lineHeight: 16, color: info.set ? C.ink2 : C.orangeInk }}>{sub}</T>
       </View>
     </TileShell>
   );
