@@ -25,6 +25,8 @@ barvy, písmo, rozměry, ikony i texty jsou převzaté odtamtud.
 | Našeptávání lékařů z registru NRPZS | ✅ offline, po nahrání dat skriptem `scripts/import-lekari.mjs` (viz níže) |
 | Vzhled | ✅ 4 pozadí a barva tlačítka „já“ z plátna |
 | Export dat | ✅ JSON přes systémové sdílení |
+| Školka (dítě 3–7 let) | ✅ dlaždice se značkou ze šatny, omluvenka a „dnes vyzvedne“ do osy + SMS školce, volání, pověřené osoby, „Co školka uvidí“ (uloží se pro fázi 2) |
+| Zprávy ze školky (teplota, úraz) | ⏳ „Připravujeme“ — protistrana je tablet [lifeos-skolka](https://github.com/goldfuse9/Lifeos-skolka), potřebuje server |
 | Notifikace, zprávy, sdílení, „Kdo se mi díval“, kód pro záchranáře | ⏳ označeno „Připravujeme“ — potřebují server (fáze 2) |
 
 ## Spuštění
