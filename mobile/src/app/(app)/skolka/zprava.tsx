@@ -5,10 +5,12 @@ import { useData, usePerson, useSession } from '@/state/session';
 import { useLoad, useNow } from '@/state/useLoad';
 import { ZAPIS_ALERT, smsUrl, vyzvDrivText, zpravaOf, type SkolkaZapis } from '@/domain/skolka';
 import { relativeDays, toLocalDate } from '@/domain/dates';
-import { Backdrop, Badge, BottomFade, Card, Divider, H1, Loading, Muted, Note, PrimaryButton, SectionLabel, T, TopBar, useScreenInsets, useToast } from '@/ui/kit';
+import { Backdrop, Badge, BottomFade, Card, Divider, H1, Loading, Muted, Note, PrimaryButton, SecondaryButton, SectionLabel, T, TopBar, useScreenInsets, useToast } from '@/ui/kit';
 import { Znacka } from '@/ui/Znacka';
 import { C } from '@/ui/theme';
-import { IconBandage, IconCheck, IconPhone, IconSms, IconThermo } from '@/ui/icons';
+import { IconBandage, IconCheck, IconPhone, IconSms, IconThermo, IconTrash } from '@/ui/icons';
+import { confirm } from '@/ui/device';
+import { cancelSchool } from '@/platform/notifications';
 
 /**
  * Zpráva ze školky — denní zápis učitelky. Nahoře to, kvůli čemu rodič
@@ -72,6 +74,19 @@ export default function SkolkaZprava() {
     touch();
     setBump((b) => b + 1);
     toast('Potvrzeno');
+  };
+
+  // Ukázka leží ve skutečné kartě dítěte. Obecný detail záznamu sem
+  // přesměrovává, takže smazat se musí dát tady — jinak by vymyšlená
+  // teplota a úraz zůstaly v ose napořád.
+  const removeDemo = async () => {
+    if (!(await confirm('Smazat ukázku?', 'Zmizí z osy i ze školky. Opravdové údaje dítěte to neovlivní.', 'Smazat'))) return;
+    await cancelSchool(rec.id).catch(() => {});
+    await data.records.softDelete(rec.id);
+    touch();
+    toast('Ukázka smazána');
+    if (router.canGoBack()) router.back();
+    else router.replace('/skolka');
   };
 
   const sms = (body: string) => {
@@ -150,6 +165,7 @@ export default function SkolkaZprava() {
             ? 'Ukázka, jak budou chodit zprávy ze školky. Skutečné zprávy začnou chodit po propojení se školkou — potvrzení přečtení pak uvidí i učitelka.'
             : 'Zpráva je uložená v ose. Potvrzení přečtení uvidí učitelka.'}
         </Note>
+        {z.demo ? <SecondaryButton style={{ marginTop: 16 }} danger label="Smazat ukázku" icon={<IconTrash size={16} color={C.danger} width={1.8} />} onPress={removeDemo} /> : null}
       </ScrollView>
       <BottomFade />
     </View>

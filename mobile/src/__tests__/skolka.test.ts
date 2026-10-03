@@ -48,6 +48,9 @@ test('zpráva ze školky — shrnutí a záznam', () => {
   expect(zpravaSummary(z)).toBe('Zvýšená teplota 37,6 °C · Odřené koleno');
   const r = zpravaRecord(z, '2026-10-03', '14:20', 'MŠ Sluníčko');
   expect(r.metadata!.badge).toBe('Ze školky');
+  // Ukázka je i v ose poznat jako ukázka, skutečná zpráva ne
+  expect(r.title).toBe('Ukázka: zpráva ze školky');
+  expect(zpravaRecord({ ...z, demo: false }, '2026-10-03', '14:20').title).toBe('Zpráva ze školky');
   expect(r.metadata!.children).toHaveLength(4);
   expect(zpravaOf({ metadata: r.metadata! })?.items[1].kind).toBe('uraz');
   expect(zpravaOf({ metadata: { skolka: 'omluvenka' } })).toBeNull();
